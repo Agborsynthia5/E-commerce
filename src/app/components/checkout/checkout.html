@@ -1,0 +1,247 @@
+<div class="checkout-page-container">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-nav">
+    <a routerLink="/cart" class="breadcrumb-item">CART</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">CHECKOUT</span>
+  </nav>
+
+  <!-- Checkout Header -->
+  <header class="checkout-header">
+    <h1 class="checkout-title">Make it yours.</h1>
+    <p class="checkout-subtitle">Confirm your delivery details and place your order. Pay when it arrives.</p>
+  </header>
+
+  <!-- Error Alert if any -->
+  @if (errorMessage()) {
+    <div class="checkout-error-banner">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Main 2-Column Grid -->
+  <div class="checkout-columns-grid">
+    <!-- Left Column: Checkout Form -->
+    <form (ngSubmit)="onSubmitOrder()" class="checkout-form-column">
+      <!-- Section 1: Contact -->
+      <section class="form-section">
+        <div class="section-header">
+          <h2 class="section-title">01 / Contact</h2>
+          <p class="section-subtitle">Ordering as Alex N. · Signed-in customer</p>
+        </div>
+
+        <div class="form-row-two-col">
+          <div class="form-field">
+            <label for="fullName" class="field-label">Full name *</label>
+            <input
+              id="fullName"
+              name="fullName"
+              type="text"
+              [(ngModel)]="fullName"
+              required
+              class="text-input"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="phone" class="field-label">Phone number *</label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              [(ngModel)]="phone"
+              required
+              class="text-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="email" class="field-label">Email address *</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            required
+            class="text-input"
+          />
+          <span class="field-helper-text">Order updates will be sent to this email.</span>
+        </div>
+      </section>
+
+      <!-- Section 2: Delivery address -->
+      <section class="form-section">
+        <div class="section-header">
+          <h2 class="section-title">02 / Delivery address</h2>
+        </div>
+
+        <div class="form-field">
+          <label for="street" class="field-label">Street address *</label>
+          <input
+            id="street"
+            name="street"
+            type="text"
+            [(ngModel)]="street"
+            required
+            class="text-input"
+          />
+        </div>
+
+        <div class="form-row-two-col">
+          <div class="form-field">
+            <label for="city" class="field-label">City *</label>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              [(ngModel)]="city"
+              required
+              class="text-input"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="neighbourhood" class="field-label">Neighbourhood *</label>
+            <input
+              id="neighbourhood"
+              name="neighbourhood"
+              type="text"
+              [(ngModel)]="neighbourhood"
+              required
+              class="text-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="instructions" class="field-label">Delivery instructions (optional)</label>
+          <input
+            id="instructions"
+            name="instructions"
+            type="text"
+            [(ngModel)]="deliveryInstructions"
+            class="text-input"
+          />
+        </div>
+
+        <!-- Green Delivery Banner (Wireframe Exact) -->
+        <div class="delivery-highlight-banner">
+          <svg class="delivery-truck-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+          <span>Standard delivery · XAF 500 for this entire order.</span>
+        </div>
+      </section>
+
+      <!-- Section 3: Payment -->
+      <section class="form-section">
+        <div class="section-header">
+          <h2 class="section-title">03 / Payment</h2>
+        </div>
+
+        <!-- Cash on delivery radio box -->
+        <label class="payment-card-option selected">
+          <div class="payment-radio-bullet">
+            <div class="radio-dot"></div>
+          </div>
+
+          <div class="payment-text-info">
+            <div class="payment-title">Cash on delivery</div>
+            <div class="payment-desc">Pay {{ grandTotal() | xaf }} to the delivery agent when your order arrives.</div>
+          </div>
+
+          <div class="payment-icon-wrapper">
+            <svg class="cash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+              <circle cx="12" cy="12" r="2"></circle>
+              <line x1="6" y1="12" x2="6.01" y2="12"></line>
+              <line x1="18" y1="12" x2="18.01" y2="12"></line>
+            </svg>
+          </div>
+        </label>
+      </section>
+
+      <!-- Back to cart link -->
+      <div class="form-footer-nav">
+        <a routerLink="/cart" class="back-to-cart-link">
+          <span class="back-arrow">←</span> Back to cart
+        </a>
+      </div>
+    </form>
+
+    <!-- Right Column: Your Order Summary Card -->
+    <aside class="your-order-column">
+      <div class="order-summary-box">
+        <h2 class="summary-heading">Your order</h2>
+
+        <!-- Compact Items List -->
+        <div class="order-items-compact-list">
+          @for (item of items(); track item.id) {
+            <div class="compact-item-row">
+              <div class="compact-thumb-box">
+                <img [src]="item.imageUrl" [alt]="item.name" class="compact-thumb" />
+              </div>
+
+              <div class="compact-meta">
+                <h3 class="compact-name">{{ item.name }}</h3>
+                <p class="compact-subtext">Size {{ item.selectedSize }} · Qty {{ item.quantity }}</p>
+                <p class="compact-price">{{ item.lineTotal | xaf }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="order-divider"></div>
+
+        <!-- Price Breakdown -->
+        <div class="breakdown-row">
+          <span class="breakdown-label">Subtotal · {{ totalItemCount() }} {{ totalItemCount() === 1 ? 'jersey' : 'jerseys' }}</span>
+          <span class="breakdown-val">{{ subtotal() | xaf }}</span>
+        </div>
+
+        <div class="breakdown-row">
+          <span class="breakdown-label">Delivery · flat per order</span>
+          <span class="breakdown-val">{{ deliveryFee() | xaf }}</span>
+        </div>
+
+        <div class="order-divider"></div>
+
+        <div class="order-total-row">
+          <span class="order-total-label">Total</span>
+          <span class="order-total-amount">{{ grandTotal() | xaf }}</span>
+        </div>
+
+        <p class="pay-on-delivery-note">Pay on delivery. No online payment is collected.</p>
+
+        <!-- Place Order Button -->
+        <button
+          type="button"
+          (click)="onSubmitOrder()"
+          [disabled]="isSubmitting() || items().length === 0"
+          class="place-order-btn"
+        >
+          @if (isSubmitting()) {
+            <span>Placing order...</span>
+          } @else {
+            <span>Place order · {{ grandTotal() | xaf }}</span>
+            <span class="arrow">→</span>
+          }
+        </button>
+
+        <p class="order-legal-note">
+          Placing an order confirms your items and delivery details. No online payment is required.
+        </p>
+
+        <!-- Wireframe Info Banner -->
+        <div class="concept-note-box">
+          <span class="info-icon">ⓘ</span>
+          <span>UI concept & live demo. Clicking 'Place order' generates your confirmed order reference & simulation!</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

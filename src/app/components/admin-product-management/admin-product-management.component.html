@@ -1,0 +1,274 @@
+<div class="store-management-container">
+  <!-- Page Header -->
+  <header class="management-header">
+    <div class="header-titles">
+      <div class="kicker-tag">OWNER / STORE MANAGEMENT</div>
+      <h1 class="page-title">Your store, at a glance.</h1>
+      <p class="page-subtitle">Manage jerseys, size-level stock and incoming orders in one place.</p>
+    </div>
+
+    <button type="button" (click)="openAddModal()" class="add-product-btn">
+      <span class="plus-sign">+</span> Add product
+    </button>
+  </header>
+
+  <!-- Informational Callout (Wireframe Exact) -->
+  <div class="demo-info-banner">
+    <span class="banner-icon">ⓘ</span>
+    <span>Sample inventory and orders for demonstration — not live business metrics.</span>
+  </div>
+
+  <!-- Tabs Row -->
+  <div class="management-tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'products'"
+      (click)="activeTab.set('products')"
+    >
+      Products ({{ allProducts().length }})
+    </button>
+
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'orders'"
+      (click)="activeTab.set('orders')"
+    >
+      Orders ({{ allOrders().length }} sample records)
+    </button>
+  </div>
+
+  <!-- Search & Filter Controls Toolbar -->
+  <div class="filter-toolbar">
+    <div class="search-input-wrapper">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        placeholder="Search product name or ID"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+        class="admin-search-input"
+      />
+    </div>
+
+    @if (activeTab() === 'products') {
+      <div class="select-dropdowns-group">
+        <select
+          [value]="selectedCategory()"
+          (change)="selectedCategory.set($any($event.target).value)"
+          class="admin-select"
+        >
+          <option value="all">All categories</option>
+          <option value="national-teams">National teams</option>
+          <option value="clubs">Clubs</option>
+        </select>
+
+        <select
+          [value]="selectedStatusFilter()"
+          (change)="selectedStatusFilter.set($any($event.target).value)"
+          class="admin-select"
+        >
+          <option value="all">Active products</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    }
+  </div>
+
+  <!-- TAB 1: PRODUCTS TABLE (Wireframe Exact) -->
+  @if (activeTab() === 'products') {
+    <div class="table-wrapper">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th class="th-product">PRODUCT</th>
+            <th class="th-price">PRICE</th>
+            <th class="th-stock">STOCK BY SIZE</th>
+            <th class="th-status">STATUS</th>
+            <th class="th-actions">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of filteredProducts(); track product.id) {
+            <tr class="table-row">
+              <!-- Product Info -->
+              <td class="td-product">
+                <div class="product-cell">
+                  <div class="table-thumb-box">
+                    <img [src]="product.imageUrl" [alt]="product.name" class="table-thumb" />
+                  </div>
+                  <div class="cell-titles">
+                    <strong class="cell-product-name">{{ product.name }}</strong>
+                    <span class="cell-category">{{ product.categoryId === 'national-teams' ? 'National teams' : 'Clubs' }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Price -->
+              <td class="td-price">
+                <span class="price-text">{{ product.price | xaf }}</span>
+              </td>
+
+              <!-- Stock by Size -->
+              <td class="td-stock">
+                <div class="stock-breakdown-cell">
+                  <strong class="total-units">{{ product.stockQuantity }} units total</strong>
+                  <span class="sizes-breakdown">{{ formatStockBreakdown(product) }}</span>
+                </div>
+              </td>
+
+              <!-- Status -->
+              <td class="td-status">
+                <span class="status-badge active-badge">Active</span>
+              </td>
+
+              <!-- Actions -->
+              <td class="td-actions">
+                <button type="button" (click)="openEditModal(product)" class="edit-link-btn">
+                  Edit <span class="arrow">↗</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Table Footer Line (Wireframe Exact) -->
+      <div class="table-summary-footer">
+        <span class="footer-left">Showing all {{ filteredProducts().length }} products · Prices fixed at XAF 6,000</span>
+        <span class="footer-right">Cameroon XXL is out of stock.</span>
+      </div>
+    </div>
+  }
+
+  <!-- TAB 2 / ORDERS SECTION (Wireframe Exact) -->
+  @if (activeTab() === 'orders') {
+    <div class="orders-section-wrapper">
+      <div class="orders-section-header">
+        <h2 class="orders-title">Orders</h2>
+        <span class="demo-records-pill">Demonstration records</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>ORDER / DATE</th>
+              <th>CUSTOMER</th>
+              <th>ITEMS</th>
+              <th>TOTAL</th>
+              <th>STATUS</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ord of filteredOrders(); track ord.id) {
+              <tr class="table-row">
+                <td>
+                  <div class="order-ref-cell">
+                    <strong>{{ ord.referenceNumber }}</strong>
+                    <span class="order-date-sub">{{ ord.createdAt | date:'d MMM yyyy' }}</span>
+                  </div>
+                </td>
+                <td>{{ ord.customerName }}</td>
+                <td>{{ ord.items.length }} {{ ord.items.length === 1 ? 'jersey' : 'jerseys' }}</td>
+                <td><strong>{{ ord.totalAmount | xaf }}</strong></td>
+                <td>
+                  <span
+                    class="status-pill"
+                    [class.status-pending]="ord.status === 'pending'"
+                    [class.status-delivery]="ord.status === 'out_for_delivery'"
+                    [class.status-delivered]="ord.status === 'delivered'"
+                  >
+                    {{ ord.statusLabel }}
+                  </span>
+                </td>
+                <td>
+                  <button type="button" (click)="openOrderDetails(ord)" class="view-order-link">
+                    View order <span class="arrow">↗</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="orders-footer-note">
+          Order totals include a single XAF 500 delivery fee. Payment method: cash on delivery.
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add / Edit Product Modal -->
+  @if (isModalOpen()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ editingProduct() ? 'Edit Jersey Listing' : 'Add New Jersey' }}</h2>
+          <button type="button" (click)="closeModal()" class="close-modal-btn">✕</button>
+        </div>
+
+        <form (ngSubmit)="saveProduct()" class="modal-form">
+          <div class="modal-field-row">
+            <div class="field-item">
+              <label class="modal-label">Jersey Name *</label>
+              <input type="text" [(ngModel)]="formName" name="name" required class="modal-input" />
+            </div>
+
+            <div class="field-item">
+              <label class="modal-label">Team / Club *</label>
+              <input type="text" [(ngModel)]="formTeam" name="team" required class="modal-input" />
+            </div>
+          </div>
+
+          <div class="modal-field-row">
+            <div class="field-item">
+              <label class="modal-label">Category *</label>
+              <select [(ngModel)]="formCategoryId" name="category" class="modal-input">
+                <option value="national-teams">National teams</option>
+                <option value="clubs">Clubs</option>
+              </select>
+            </div>
+
+            <div class="field-item">
+              <label class="modal-label">Price (XAF) *</label>
+              <input type="number" [(ngModel)]="formPrice" name="price" required class="modal-input" />
+            </div>
+          </div>
+
+          <div class="field-item full-width">
+            <label class="modal-label">Image Asset URL / Path *</label>
+            <input type="text" [(ngModel)]="formImageUrl" name="imageUrl" required class="modal-input" />
+          </div>
+
+          <div class="field-item full-width">
+            <label class="modal-label">Description</label>
+            <textarea [(ngModel)]="formDescription" name="description" rows="2" class="modal-textarea"></textarea>
+          </div>
+
+          <!-- Stock per size breakdown -->
+          <div class="sizes-stock-section">
+            <label class="modal-label">Inventory Units per Size</label>
+            <div class="sizes-stock-grid">
+              <div class="stock-input-item">
+                <span class="size-tag">S</span>
+                <input type="number" [(ngModel)]="formStockS" name="stockS" min="0" class="mini-stock-input" />
+              </div>
+              <div class="stock-input-item">
+                <span class="size-tag">M</span>
+                <input type="number" [(ngModel)]="formStockM" name="stockM" min="0" class="mini-stock-input" />
+              </div>
+              <div class="stock-input-item">
+                <span class="size-tag">L</span>
+                <input type="number" [(ngModel)]="formStockL" name="stockL" min="0" class="mini-stock-input" />
+              </div>
+              <div class="stock-input-item">
+                <span class="size-tag">XL</span>
+                <input type="number" [(ngModel)]="formStockXL" name="stockXL" min="0" class="mini-stock-input" />
+ 

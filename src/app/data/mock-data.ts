@@ -1,0 +1,301 @@
+import {
+  CartItem,
+  Category,
+  Order,
+  Product,
+  User,
+} from '../models';
+
+export const MOCK_USER_ID = 'alex-nsom';
+
+export const MOCK_USERS: User[] = [
+  {
+    id: MOCK_USER_ID,
+    name: 'Alex Nsom',
+    email: 'alex.nsom@example.com',
+    phone: '+237 6 77 12 34 56',
+    role: 'customer',
+    createdAt: new Date('2026-01-15'),
+  },
+  {
+    id: 'store-owner',
+    name: 'Alex N. (Store Owner)',
+    email: 'owner@leedstore.cm',
+    phone: '+237 6 99 88 77 66',
+    role: 'owner',
+    createdAt: new Date('2025-06-01'),
+  },
+];
+
+export const MOCK_CATEGORIES: Category[] = [
+  {
+    id: 'all-jerseys',
+    name: 'All jerseys',
+    slug: 'all-jerseys',
+    count: 6,
+    description: 'National pride. Club loyalty. One simple price: XAF 6,000 per jersey.',
+  },
+  {
+    id: 'national-teams',
+    name: 'National teams',
+    slug: 'national-teams',
+    count: 4,
+    description: 'Cameroon, Nigeria, France, Argentina and other proud national sides.',
+  },
+  {
+    id: 'clubs',
+    name: 'Clubs',
+    slug: 'clubs',
+    count: 2,
+    description: 'Madrid, Barcelona and elite football clubs.',
+  },
+];
+
+export const MOCK_PRODUCTS: Product[] = [
+  {
+    id: 'cameroon-home',
+    categoryId: 'national-teams',
+    team: 'Cameroon',
+    name: 'Cameroon Home Jersey',
+    description:
+      "Wear Cameroon's colours with pride. A deep-green home jersey with a subtle tonal pattern, a yellow neckline and red sleeve trim. Lightweight polyester keeps the feel easy from the stands to the street.",
+    price: 6000,
+    imageUrl: 'assets/jerseys/cameroon home.jpg',
+    gallery: [
+      { label: 'Front', url: 'assets/jerseys/cameroon home.jpg' },
+      { label: 'Back', url: 'assets/jerseys/backview cameroon home.jpg' },
+      { label: 'Fabric & crest', url: 'assets/jerseys/neckview cameroon home.jpg' },
+    ],
+    sizes: ['S', 'M', 'L', 'XL'],
+    stockQuantity: 24,
+    stockBySize: { S: 4, M: 8, L: 7, XL: 5, XXL: 0 },
+    features: [
+      'Regular fit, short sleeves',
+      'Breathable polyester mesh',
+      'Embroidered lion crest',
+      'Machine wash cold; do not tumble dry',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'nigeria-home',
+    categoryId: 'national-teams',
+    team: 'Nigeria',
+    name: 'Nigeria Home Jersey',
+    description:
+      'Inspired by traditional agbada robes with modern athletic aerodynamics. Vibrant eagle-feather chevron pattern that captured global fashion and football pride.',
+    price: 6000,
+    imageUrl: 'assets/jerseys/Nigeria home.jpg',
+    gallery: [
+      { label: 'Front', url: 'assets/jerseys/Nigeria home.jpg' },
+      { label: 'Pattern', url: 'assets/jerseys/Nigeria home.jpg' },
+    ],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    stockQuantity: 20,
+    stockBySize: { S: 3, M: 5, L: 6, XL: 4, XXL: 2 },
+    features: [
+      'Iconic Naija eagle-wing chevrons',
+      'Breathable sweat-wicking knit',
+      'Embroidered Nigeria Football Federation badge',
+      'Standard athletic cut',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'france-home',
+    categoryId: 'national-teams',
+    team: 'France',
+    name: 'France Home Jersey',
+    description:
+      'Regal French royal blue home shirt with vintage fold-over polo collar, golden Gallic rooster crest with two stars and iconic chest number 10.',
+    price: 6000,
+    imageUrl: 'assets/jerseys/images.jpg',
+    gallery: [
+      { label: 'Front', url: 'assets/jerseys/images.jpg' },
+    ],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    stockQuantity: 14,
+    stockBySize: { S: 2, M: 4, L: 4, XL: 3, XXL: 1 },
+    features: [
+      'Classic fold-over polo collar',
+      'Embroidered Gallic Rooster with two gold stars',
+      'Printed #10 match specification',
+      'Lightweight open-hole mesh ventilation',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'argentina-home',
+    categoryId: 'national-teams',
+    team: 'Argentina',
+    name: 'Argentina Home Jersey',
+    description:
+      'World champion celestial blue and white vertical stripes. Featuring the iconic #10 on back with three gold championship stars above the federation crest.',
+    price: 6000,
+    imageUrl: 'assets/jerseys/argentina.jpeg',
+    gallery: [
+      { label: 'Front', url: 'assets/jerseys/argentina.jpeg' },
+    ],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    stockQuantity: 18,
+    stockBySize: { S: 3, M: 5, L: 5, XL: 3, XXL: 2 },
+    features: [
+      'Three gold embroidered World Cup stars',
+      'MESSI 10 legend designation',
+      'Contrast ribbed black collar and cuffs',
+      'AEROREADY moisture absorbing fabric',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'madrid-home',
+    categoryId: 'clubs',
+    team: 'Madrid',
+    name: 'Madrid Home Jersey',
+    description:
+      'Crisp Madrid royal white with signature dark accents and Emirates Fly Better branding. The undisputed jersey of European royalty and championship pedigree.',
+    price: 6000,
+    imageUrl: 'assets/jerseys/real white.jpg',
+    gallery: [
+      { label: 'Front', url: 'assets/jerseys/real white.jpg' },
+    ],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    stockQuantity: 16,
+    stockBySize: { S: 2, M: 5, L: 4, XL: 3, XXL: 2 },
+    features: [
+      'Pristine white textured pique weave',
+      'Embroidered Real Madrid crown crest',
+      'Navy and gold shoulder details',
+      'Emirates FLY BETTER sponsor graphic',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'barcelona-home',
+    categoryId: 'clubs',
+    team: 'Barcelona',
+    name: 'Barcelona Home Jersey',
+    description:
+      'Deep Blaugrana half-and-half garnet and deep blue stripes honoring 125 years of football heritage. Finished with gold Spotify chest branding.',
+    price: 6000,
+    imageUrl: 'assets/jerseys/barca new home.jpg',
+    gallery: [
+      { label: 'Front', url: 'assets/jerseys/barca new home.jpg' },
+    ],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    stockQuantity: 12,
+    stockBySize: { S: 2, M: 3, L: 3, XL: 2, XXL: 2 },
+    features: [
+      '125th anniversary dual-tone Blaugrana pattern',
+      'Woven FC Barcelona emblem',
+      'Gold Spotify chest logo',
+      'Senyera Catalan flag on back neckline',
+    ],
+    status: 'active',
+  },
+];
+
+export const MOCK_CART_ITEMS: CartItem[] = [
+  {
+    id: 'cart-item-cameroon',
+    userId: MOCK_USER_ID,
+    productId: 'cameroon-home',
+    selectedSize: 'M',
+    quantity: 1,
+  },
+  {
+    id: 'cart-item-nigeria',
+    userId: MOCK_USER_ID,
+    productId: 'nigeria-home',
+    selectedSize: 'L',
+    quantity: 1,
+  },
+];
+
+export const MOCK_ORDERS: Order[] = [
+  {
+    id: 'KH-1042',
+    referenceNumber: 'KH-1042',
+    userId: MOCK_USER_ID,
+    customerName: 'Alex Nsom',
+    customerPhone: '+237 6 77 12 34 56',
+    customerEmail: 'alex.nsom@example.com',
+    address: {
+      fullName: 'Alex Nsom',
+      phone: '+237 6 77 12 34 56',
+      email: 'alex.nsom@example.com',
+      street: '24 Rue de la Paix',
+      city: 'Douala',
+      neighbourhood: 'Akwa',
+      instructions: 'Call on arrival. Entrance beside the pharmacy.',
+    },
+    items: [
+      {
+        id: 'item-1042-1',
+        productId: 'cameroon-home',
+        productName: 'Cameroon Home Jersey',
+        productImageUrl: 'assets/jerseys/cameroon home.jpg',
+        categoryName: 'National teams',
+        selectedSize: 'M',
+        quantity: 1,
+        unitPrice: 6000,
+        lineTotal: 6000,
+      },
+      {
+        id: 'item-1042-2',
+        productId: 'nigeria-home',
+        productName: 'Nigeria Home Jersey',
+        productImageUrl: 'assets/jerseys/Nigeria home.jpg',
+        categoryName: 'National teams',
+        selectedSize: 'L',
+        quantity: 1,
+        unitPrice: 6000,
+        lineTotal: 6000,
+      },
+    ],
+    subtotal: 12000,
+    deliveryFee: 500,
+    totalAmount: 12500,
+    paymentMethod: 'cash_on_delivery',
+    status: 'pending',
+    statusLabel: 'Pending confirmation',
+    createdAt: new Date('2026-10-21T10:30:00'),
+  },
+  {
+    id: 'KH-1041',
+    referenceNumber: 'KH-1041',
+    userId: 'user-marie',
+    customerName: 'Marie Fomba',
+    customerPhone: '+237 6 55 44 33 22',
+    customerEmail: 'marie.fomba@example.com',
+    address: {
+      fullName: 'Marie Fomba',
+      phone: '+237 6 55 44 33 22',
+      email: 'marie.fomba@example.com',
+      street: 'Boulevard de la Liberté',
+      city: 'Douala',
+      neighbourhood: 'Bonanjo',
+      instructions: 'Leave at reception desk.',
+    },
+    items: [
+      {
+        id: 'item-1041-1',
+        productId: 'cameroon-home',
+        productName: 'Cameroon Home Jersey',
+        productImageUrl: 'assets/jerseys/cameroon home.jpg',
+        categoryName: 'National teams',
+        selectedSize: 'S',
+        quantity: 1,
+        unitPrice: 6000,
+        lineTotal: 6000,
+      },
+    ],
+    subtotal: 6000,
+    deliveryFee: 500,
+    totalAmount: 6500,
+    paymentMethod: 'cash_on_delivery',
+    status: 'out_for_delivery',
+    statusLabel: 'Out for delivery',
+    createdAt: new Date('2026-10-20T14:15:00'),
+  },
+];

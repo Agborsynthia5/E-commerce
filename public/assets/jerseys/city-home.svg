@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="100%" height="100%">
+  <defs>
+    <filter id="shadowCity" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000" flood-opacity="0.22" />
+    </filter>
+    <linearGradient id="cityBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#93cbfb" />
+      <stop offset="50%" stop-color="#6cabdd" />
+      <stop offset="100%" stop-color="#4d96d2" />
+    </linearGradient>
+    <clipPath id="cityJerseyClip">
+      <path d="M 185 45 
+               C 170 48, 140 58, 100 85 
+               L 30 155 
+               C 25 160, 30 178, 48 190 
+               L 98 220 
+               C 108 226, 118 218, 122 205 
+               L 138 155 
+               L 138 480 
+               C 138 495, 148 505, 165 505 
+               L 335 505 
+               C 352 505, 362 495, 362 480 
+               L 362 155 
+               L 378 205 
+               C 382 218, 392 226, 402 220 
+               L 452 190 
+               C 470 178, 475 160, 470 155 
+               L 400 85 
+               C 360 58, 330 48, 315 45 
+               C 305 75, 275 92, 250 92 
+               C 225 92, 195 75, 185 45 Z" />
+    </clipPath>
+  </defs>
+
+  <g filter="url(#shadowCity)">
+    <!-- Base Sky Blue Jersey -->
+    <rect width="500" height="560" fill="url(#cityBlue)" clip-path="url(#cityJerseyClip)" />
+
+    <g clip-path="url(#cityJerseyClip)">
+      <!-- White & Navy Collar and Cuffs -->
+      <!-- Left Cuff -->
+      <path d="M 30 155 L 48 190 L 98 220 L 78 185 Z" fill="#ffffff" />
+      <path d="M 40 172 L 48 190 L 98 220 L 88 202 Z" fill="#001838" />
+
+      <!-- Right Cuff -->
+      <path d="M 470 155 L 452 190 L 402 220 L 422 185 Z" fill="#ffffff" />
+      <path d="M 460 172 L 452 190 L 402 220 L 412 202 Z" fill="#001838" />
+
+      <!-- Collar Trim -->
+      <path d="M 185 45 Q 250 85 315 45 Q 285 102 250 110 Q 215 102 185 45 Z" fill="#ffffff" />
+      <path d="M 205 48 Q 250 80 295 48 Q 275 95 250 102 Q 225 95 205 48 Z" fill="url(#cityBlue)" />
+      <path d="M 215 50 Q 250 72 285 50 Q 280 62 250 68 Q 220 62 215 50 Z" fill="#001838" />
+
+      <!-- Manchester City Round Crest (Left Chest) -->
+      <g transform="translate(190, 165)">
+        <circle cx="0" cy="0" r="22" fill="#ffffff" stroke="#001838" stroke-width="2.5" />
+        <circle cx="0" cy="0" r="18" fill="#6cabdd" />
+        <!-- Shield Inside -->
+        <path d="M -11 -8 L 11 -8 L 11 4 Q 11 12 0 16 Q -11 12 -11 4 Z" fill="#ffffff" stroke="#001838" stroke-width="1.2" />
+        <!-- Golden Ship at Top of Shield -->
+        <path d="M -8 -4 L 8 -4 L 6 0 L -6 0 Z" fill="#d4af37" />
+        <!-- Red Rose of Lancashire at Bottom -->
+        <circle cx="0" cy="8" r="3.5" fill="#c1121f" />
+        <!-- Small City text arc -->
+        <text x="0" y="-12" font-family="'Segoe UI', Roboto, sans-serif" font-size="5" font-weight="900" fill="#001838" text-anchor="middle">MANCHESTER</text>
+        <text x="0" y="19" font-family="'Segoe UI', Roboto, sans-serif" font-size="5" font-weight="900" fill="#001838" text-anchor="middle">CITY</text>
+      </g>
+
+      <!-- White Puma Cat Logo (Right Chest) -->
+      <g transform="translate(315, 165)">
+        <path d="M -14 0 C -10 -8, 2 -8, 12 -2 C 6 2, -2 4, -14 0 Z" fill="#ffffff" />
+        <circle cx="-13" cy="-4" r="2.5" fill="#ffffff" />
+      </g>
+
+      <!-- ETIHAD AIRWAYS Sponsor (Navy Blue) -->
+      <g transform="translate(250, 265)">
+        <text x="0" y="0" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#001838" text-anchor="middle" letter-spacing="3">ETIHAD</text>
+        <text x="0" y="22" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#001838" text-anchor="middle" letter-spacing="6">AIRWAYS</text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,236 @@
+@if (product(); as item) {
+  <div class="product-detail-container">
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+      <a routerLink="/" class="breadcrumb-item">Shop jerseys</a>
+      <span class="breadcrumb-separator">/</span>
+      <a routerLink="/" [queryParams]="{ category: item.categoryId }" class="breadcrumb-item">
+        {{ item.categoryId === 'national-teams' ? 'National teams' : 'Clubs' }}
+      </a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">{{ item.name }}</span>
+    </nav>
+
+    <!-- Main 2-Column Product Detail Layout -->
+    <div class="detail-columns-grid">
+      <!-- Left Column: Image Gallery Carousel -->
+      <section class="gallery-column">
+        <!-- Main Image Stage with Chevrons -->
+        <div class="main-image-stage">
+          <button
+            type="button"
+            (click)="prevImage()"
+            class="gallery-nav-btn prev-btn"
+            aria-label="Previous image"
+          >
+            ‹
+          </button>
+
+          <img
+            [src]="activeImage().url"
+            [alt]="item.name + ' - ' + activeImage().label"
+            class="main-jersey-img"
+          />
+
+          <button
+            type="button"
+            (click)="nextImage()"
+            class="gallery-nav-btn next-btn"
+            aria-label="Next image"
+          >
+            ›
+          </button>
+        </div>
+
+        <!-- Image Counter and Label -->
+        <div class="image-indicator-row">
+          {{ currentImageIndex() + 1 }} / {{ galleryImages().length }} · {{ activeImage().label }}
+        </div>
+
+        <!-- Thumbnails Row -->
+        <div class="thumbnails-grid">
+          @for (img of galleryImages(); track $index) {
+            <button
+              type="button"
+              class="thumb-btn"
+              [class.active]="currentImageIndex() === $index"
+              (click)="setImage($index)"
+            >
+              <div class="thumb-img-wrapper">
+                <img [src]="img.url" [alt]="img.label" class="thumb-img" />
+              </div>
+              <span class="thumb-label">{{ img.label }}</span>
+            </button>
+          }
+        </div>
+
+        <p class="explore-caption">Explore the front, back and fabric detail.</p>
+      </section>
+
+      <!-- Right Column: Purchase Options & Story -->
+      <section class="details-column">
+        <!-- Category Tag Pill -->
+        <div class="category-pill">
+          {{ item.categoryId === 'national-teams' ? 'National teams' : 'Clubs' }} · {{ item.team }}
+        </div>
+
+        <!-- Product Name -->
+        <h1 class="product-title">{{ item.name }}</h1>
+
+        <!-- Price -->
+        <div class="price-container">
+          <div class="price-value">{{ item.price | xaf }}</div>
+          <div class="price-delivery-note">+ XAF 500 delivery per order</div>
+        </div>
+
+        <!-- Size Selection -->
+        <div class="size-section">
+          <div class="size-header-row">
+            <span class="size-label">Select size · <strong>{{ selectedSize() }}</strong></span>
+            <span class="fit-guide">Regular fit</span>
+          </div>
+
+          <div class="size-buttons-row">
+            @for (sz of allSizes; track sz) {
+              @let isSoldOut = isSizeSoldOut(item, sz);
+              <button
+                type="button"
+                class="size-choice-btn"
+                [class.selected]="selectedSize() === sz"
+                [class.sold-out]="isSoldOut"
+                [disabled]="isSoldOut"
+                (click)="selectSize(sz)"
+              >
+                {{ sz }}
+              </button>
+            }
+          </div>
+
+          <!-- Stock Indicator Message -->
+          <p class="stock-status-notice" [class.error-notice]="isSelectedSizeSoldOut()">
+            {{ stockStatusNotice() }}
+          </p>
+        </div>
+
+        <!-- Quantity Stepper -->
+        <div class="quantity-section">
+          <label class="quantity-label">Quantity</label>
+          <div class="quantity-stepper">
+            <button
+              type="button"
+              (click)="decrementQty()"
+              [disabled]="quantity() <= 1"
+              class="qty-btn"
+              aria-label="Decrease quantity"
+            >
+              –
+            </button>
+            <span class="qty-display">{{ quantity() }}</span>
+            <button
+              type="button"
+              (click)="incrementQty()"
+              [disabled]="quantity() >= availableStockInSelectedSize()"
+              class="qty-btn"
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <!-- Notification Toast if Added -->
+        @if (addedNotification()) {
+          <div class="added-alert">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>{{ addedNotification() }}</span>
+            <a routerLink="/cart" class="alert-cart-link">View Cart →</a>
+          </div>
+        }
+
+        <!-- Add to Cart CTA Button -->
+        <button
+          type="button"
+          (click)="addToCart()"
+          [disabled]="isSelectedSizeSoldOut()"
+          class="add-to-cart-btn"
+        >
+          <span>Add to cart · {{ (item.price * quantity()) | xaf }}</span>
+          <svg class="btn-bag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+        </button>
+
+        <p class="single-order-helper">
+          Buying just this jersey? Total with delivery: {{ singleJerseyTotalWithDelivery() | xaf }}.
+        </p>
+
+        <div class="content-divider"></div>
+
+        <!-- Product Narrative & Specifications -->
+        <div class="product-narrative">
+          <h2 class="narrative-heading">Made for match day. And every day.</h2>
+          <p class="narrative-text">{{ item.description }}</p>
+
+          <ul class="features-list">
+            @for (feature of item.features; track feature) {
+              <li class="feature-item">{{ feature }}</li>
+            }
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- Bottom Feature Callout Cards (Wireframe Exact) -->
+    <section class="value-props-container">
+      <div class="prop-card">
+        <div class="prop-icon-box">
+          <svg class="prop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div class="prop-content">
+          <h3 class="prop-title">Simple delivery</h3>
+          <p class="prop-desc">XAF 500 once per order.</p>
+        </div>
+      </div>
+
+      <div class="prop-card">
+        <div class="prop-icon-box">
+          <svg class="prop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+          </svg>
+        </div>
+        <div class="prop-content">
+          <h3 class="prop-title">Pay on delivery</h3>
+          <p class="prop-desc">Review your order before placing it.</p>
+        </div>
+      </div>
+
+      <div class="prop-card">
+        <div class="prop-icon-box">
+          <svg class="prop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path>
+          </svg>
+        </div>
+        <div class="prop-content">
+          <h3 class="prop-title">Your fit, your colours</h3>
+          <p class="prop-desc">Select a size before adding to cart.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+} @else {
+  <div class="product-not-found-container">
+    <h2>Jersey not found</h2>
+    <p>The jersey you are looking for is not in the catalog.</p>
+    <a routerLink="/" class="back-to-catalog-btn">← Back to jerseys catalog</a>
+  </div>
+}

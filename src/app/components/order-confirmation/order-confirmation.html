@@ -1,0 +1,121 @@
+<div class="confirmation-page-container">
+  @if (order(); as ord) {
+    <div class="confirmation-card">
+      <!-- Success Banner -->
+      <div class="success-icon-badge">
+        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <div class="kicker-tag">ORDER CONFIRMED</div>
+      <h1 class="confirm-title">Thank you for your order!</h1>
+      <p class="confirm-subtitle">
+        Your order <strong>{{ ord.referenceNumber }}</strong> is registered. We are packaging your kits for prompt dispatch in Douala.
+      </p>
+
+      <!-- Key Details Summary Bar -->
+      <div class="meta-strip">
+        <div class="meta-item">
+          <span class="meta-label">Reference</span>
+          <span class="meta-value">{{ ord.referenceNumber }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Date</span>
+          <span class="meta-value">{{ ord.createdAt | date:'d MMM yyyy, HH:mm' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="status-pill status-pending">{{ ord.statusLabel }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Payment</span>
+          <span class="meta-value">Cash on Delivery</span>
+        </div>
+      </div>
+
+      <!-- 2-Column Overview: Delivery & Items -->
+      <div class="details-split-grid">
+        <!-- Delivery info -->
+        <div class="info-block">
+          <h2 class="block-title">Delivery Address & Contact</h2>
+          <div class="address-details">
+            <p class="addr-name">{{ ord.customerName }}</p>
+            <p class="addr-line">{{ ord.address.street }}</p>
+            <p class="addr-line">{{ ord.address.neighbourhood }}, {{ ord.address.city }}</p>
+            <p class="addr-contact">Phone: {{ ord.customerPhone }}</p>
+            <p class="addr-contact">Email: {{ ord.customerEmail }}</p>
+            @if (ord.address.instructions) {
+              <p class="addr-instructions">
+                <strong>Note:</strong> {{ ord.address.instructions }}
+              </p>
+            }
+          </div>
+        </div>
+
+        <!-- Financial breakdown -->
+        <div class="info-block">
+          <h2 class="block-title">Payment Summary</h2>
+          <div class="payment-breakdown">
+            <div class="p-row">
+              <span>Subtotal ({{ ord.items.length }} items)</span>
+              <span>{{ ord.subtotal | xaf }}</span>
+            </div>
+            <div class="p-row">
+              <span>Flat delivery</span>
+              <span>{{ ord.deliveryFee | xaf }}</span>
+            </div>
+            <div class="p-divider"></div>
+            <div class="p-row total-highlight">
+              <span>Total due on arrival</span>
+              <span class="highlight-amount">{{ ord.totalAmount | xaf }}</span>
+            </div>
+            <p class="pay-note">
+              Please have exact change of {{ ord.totalAmount | xaf }} ready for the courier.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <div class="ordered-items-section">
+        <h2 class="block-title">Ordered Jerseys</h2>
+        <div class="items-table">
+          @for (item of ord.items; track item.id) {
+            <div class="item-receipt-row">
+              <div class="receipt-thumb-box">
+                <img [src]="item.productImageUrl" [alt]="item.productName" class="receipt-thumb" />
+              </div>
+              <div class="receipt-meta">
+                <h3 class="receipt-name">{{ item.productName }}</h3>
+                <p class="receipt-variant">Size: {{ item.selectedSize }} · Qty: {{ item.quantity }}</p>
+              </div>
+              <div class="receipt-price">
+                {{ item.lineTotal | xaf }}
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="confirm-actions-row">
+        <a routerLink="/" class="primary-btn">
+          Continue shopping
+        </a>
+        <a routerLink="/admin" class="secondary-btn">
+          View in store management ↗
+        </a>
+        <button type="button" (click)="printReceipt()" class="text-btn">
+          Print receipt ⎙
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="order-not-found">
+      <h2>Order reference not found</h2>
+      <p>We could not find the requested order record.</p>
+      <a routerLink="/" class="primary-btn">Return to Storefront</a>
+    </div>
+  }
+</div>

@@ -1,0 +1,142 @@
+<div class="admin-page-container">
+  <!-- Header -->
+  <header class="admin-header-row">
+    <div>
+      <div class="kicker-tag">STORE OWNER DASHBOARD</div>
+      <h1 class="admin-title">Performance & Inventory Overview</h1>
+      <p class="admin-subtitle">Live store statistics, revenue generated, and warehouse inventory status.</p>
+    </div>
+
+    <div class="header-actions">
+      <a routerLink="/admin/products" class="primary-btn">
+        Manage Catalog & Stock →
+      </a>
+    </div>
+  </header>
+
+  <!-- Metrics Grid -->
+  <section class="metrics-grid">
+    <!-- Total Revenue Card -->
+    <div class="metric-card">
+      <div class="metric-head">
+        <span class="metric-title">Total Sales Revenue</span>
+        <div class="metric-icon-box">
+          <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="metric-value">{{ totalRevenue() | xaf }}</div>
+      <div class="metric-note">From {{ orders().length }} completed & active orders</div>
+    </div>
+
+    <!-- Active Orders Card -->
+    <div class="metric-card">
+      <div class="metric-head">
+        <span class="metric-title">Active Orders</span>
+        <div class="metric-icon-box accent-box">
+          <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+            <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="metric-value">{{ activeOrdersCount() }}</div>
+      <div class="metric-note">Awaiting delivery & customer confirmation</div>
+    </div>
+
+    <!-- Total Catalog Units -->
+    <div class="metric-card">
+      <div class="metric-head">
+        <span class="metric-title">Total Inventory Units</span>
+        <div class="metric-icon-box">
+          <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="metric-value">{{ totalStockUnits() }}</div>
+      <div class="metric-note">Across {{ products().length }} jersey models</div>
+    </div>
+
+    <!-- Stock Alerts Card -->
+    <div class="metric-card alert-card">
+      <div class="metric-head">
+        <span class="metric-title">Stock Warnings</span>
+        <div class="metric-icon-box warning-box">
+          <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+      </div>
+      <div class="metric-value text-amber">{{ lowStockAlerts().length }} alerts</div>
+      <div class="metric-note">Sizes out of stock or running low</div>
+    </div>
+  </section>
+
+  <!-- Stock Alerts Detail List -->
+  @if (lowStockAlerts().length > 0) {
+    <section class="alerts-section">
+      <h2 class="sub-heading">Warehouse Stock Alerts</h2>
+      <div class="alerts-grid">
+        @for (alert of lowStockAlerts(); track $index) {
+          <div class="alert-item" [class.out-of-stock]="alert.isOut">
+            <span class="alert-dot"></span>
+            <div class="alert-info">
+              <strong>{{ alert.product }}</strong>
+              <span class="alert-size">Size {{ alert.size }}</span>
+            </div>
+            <span class="alert-count">
+              {{ alert.isOut ? 'SOLD OUT (0 left)' : alert.count + ' units remaining' }}
+            </span>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Recent Orders Table Preview -->
+  <section class="recent-orders-section">
+    <div class="section-title-row">
+      <h2 class="sub-heading">Recent Orders</h2>
+      <a routerLink="/admin/products" class="view-all-link">Manage all orders in Store Management →</a>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ORDER REF</th>
+            <th>CUSTOMER</th>
+            <th>ITEMS</th>
+            <th>TOTAL</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ord of recentOrders(); track ord.id) {
+            <tr>
+              <td><strong>{{ ord.referenceNumber }}</strong></td>
+              <td>{{ ord.customerName }}</td>
+              <td>{{ ord.items.length }} {{ ord.items.length === 1 ? 'jersey' : 'jerseys' }}</td>
+              <td><strong>{{ ord.totalAmount | xaf }}</strong></td>
+              <td>
+                <span
+                  class="status-pill"
+                  [class.pending]="ord.status === 'pending'"
+                  [class.out]="ord.status === 'out_for_delivery'"
+                  [class.delivered]="ord.status === 'delivered'"
+                >
+                  {{ ord.statusLabel }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

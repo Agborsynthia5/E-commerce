@@ -1,0 +1,110 @@
+<!-- Top Dark Green Accent Stripe -->
+<div class="top-accent-bar"></div>
+
+<!-- Main Navigation Bar -->
+<header class="navbar-wrapper">
+  <div class="navbar-container">
+    <!-- Left Navigation Links -->
+    <nav class="nav-links" aria-label="Main Navigation">
+      <a
+        routerLink="/"
+        [queryParams]="{}"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link"
+      >
+        Shop jerseys
+        <span class="active-dot"></span>
+      </a>
+
+      <a
+        routerLink="/"
+        [queryParams]="{ category: 'national-teams' }"
+        routerLinkActive="active"
+        class="nav-link"
+      >
+        National teams
+        <span class="active-dot"></span>
+      </a>
+
+      <a
+        routerLink="/"
+        [queryParams]="{ category: 'clubs' }"
+        routerLinkActive="active"
+        class="nav-link"
+      >
+        Clubs
+        <span class="active-dot"></span>
+      </a>
+
+      <a
+        routerLink="/admin"
+        routerLinkActive="active"
+        class="nav-link"
+      >
+        Store management
+        <span class="active-dot"></span>
+      </a>
+    </nav>
+
+    <!-- Center Brand Logo -->
+    <div class="brand-logo-container">
+      <a routerLink="/" class="brand-logo">LEEDSTORE</a>
+    </div>
+
+    <!-- Right Actions: Search & Cart -->
+    <div class="nav-actions">
+      <a routerLink="/" [queryParams]="{ focusSearch: 'true' }" class="action-btn" title="Search catalog">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span class="sr-only">Search</span>
+      </a>
+
+      <a routerLink="/cart" class="action-btn cart-btn" title="View Shopping Cart">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        @if (cartCount() > 0) {
+          <span class="cart-badge">{{ cartCount() }}</span>
+        }
+        <span class="sr-only">Cart</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Sub-header Row (Customer context vs Owner workspace context) -->
+<div class="sub-header-bar">
+  <div class="sub-header-container">
+    @if (isOwnerRoute()) {
+      <div class="sub-left owner-mode">
+        <span class="workspace-tag">OWNER WORKSPACE</span>
+        <span class="divider">/</span>
+        <span class="meta-tag">Demo store data</span>
+      </div>
+
+      <div class="sub-right">
+        <a routerLink="/" class="storefront-link">
+          View storefront <span class="arrow">↗</span>
+        </a>
+      </div>
+    } @else {
+      <div class="sub-left customer-mode">
+        <span class="signed-in-text">Signed in as <strong>Alex</strong> / Customer</span>
+        <button type="button" (click)="toggleRole()" class="role-switch-btn" title="Switch between Customer and Owner views">
+          (Switch to Owner view)
+        </button>
+      </div>
+
+      <div class="sub-right">
+        <a routerLink="/cart" class="cart-summary-link">
+          Cart ({{ cartCount() }}) · {{ cartTotalWithDelivery() | xaf }} incl. delivery
+        </a>
+      </div>
+    }
+  </div>
+</div>

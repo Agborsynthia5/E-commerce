@@ -1,0 +1,196 @@
+<div class="catalog-page-container">
+  <!-- Hero / Catalog Header -->
+  <section class="catalog-header-section">
+    <div class="kicker-tag">THE LEEDSTORE CATALOG</div>
+    <h1 class="hero-title">Find your colours.</h1>
+    <p class="hero-subtitle">National pride. Club loyalty. One simple price: XAF 6,000 per jersey.</p>
+
+    <!-- Search and Sort Toolbar -->
+    <div class="toolbar-wrapper">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          #searchInput
+          type="text"
+          placeholder="Search jerseys or teams"
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+          class="search-input"
+        />
+        @if (searchTerm()) {
+          <button type="button" (click)="searchTerm.set('')" class="clear-search-btn">✕</button>
+        }
+      </div>
+
+      <div class="sort-box">
+        <label for="catalog-sort" class="sort-label">Sort:</label>
+        <select id="catalog-sort" [value]="sortBy()" (change)="setSort($event)" class="sort-select">
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name-asc">Name: A to Z</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Catalog Content: Sidebar + Products Grid -->
+  <div class="catalog-body-layout">
+    <!-- Left Filters Sidebar -->
+    <aside class="filters-sidebar">
+      <div class="filters-header">
+        <h2 class="filters-title">Filters</h2>
+        <button type="button" (click)="resetFilters()" class="reset-btn">Reset</button>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">Category</h3>
+        <label class="filter-checkbox-row">
+          <input
+            type="radio"
+            name="category"
+            [checked]="selectedCategory() === 'all' || selectedCategory() === 'all-jerseys'"
+            (change)="selectCategory('all')"
+            class="checkbox-input"
+          />
+          <span class="checkbox-label">All jerseys ({{ allCount() }})</span>
+        </label>
+
+        <label class="filter-checkbox-row">
+          <input
+            type="radio"
+            name="category"
+            [checked]="selectedCategory() === 'national-teams'"
+            (change)="selectCategory('national-teams')"
+            class="checkbox-input"
+          />
+          <span class="checkbox-label">National teams ({{ nationalCount() }})</span>
+        </label>
+
+        <label class="filter-checkbox-row">
+          <input
+            type="radio"
+            name="category"
+            [checked]="selectedCategory() === 'clubs'"
+            (change)="selectCategory('clubs')"
+            class="checkbox-input"
+          />
+          <span class="checkbox-label">Clubs ({{ clubsCount() }})</span>
+        </label>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- Team Filter -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">Team</h3>
+        @for (team of teamsList; track team) {
+          <label class="filter-checkbox-row">
+            <input
+              type="checkbox"
+              [checked]="isTeamSelected(team)"
+              (change)="toggleTeam(team)"
+              class="checkbox-input"
+            />
+            <span class="checkbox-label">{{ team }}</span>
+          </label>
+        }
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- Size Filter -->
+      <div class="filter-group">
+        <h3 class="filter-group-title">Size</h3>
+        <div class="size-button-grid">
+          @for (size of availableSizes; track size) {
+            <button
+              type="button"
+              class="size-filter-btn"
+              [class.active]="selectedSize() === size"
+              (click)="toggleSize(size)"
+            >
+              {{ size }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- One Fair Price Highlight Box (from Wireframe) -->
+      <div class="fair-price-callout">
+        <h4 class="callout-title">One fair price.</h4>
+        <p class="callout-text">
+          Every jersey XAF 6,000. Flat delivery XAF 500, no matter how many you choose.
+        </p>
+      </div>
+    </aside>
+
+    <!-- Right Products Area -->
+    <main class="products-main-area">
+      <div class="grid-header-row">
+        <h2 class="active-category-heading">{{ currentCategoryTitle() }}</h2>
+        <span class="product-counter">Showing {{ filteredProducts().length }} of {{ allProducts().length }}</span>
+      </div>
+
+      @if (filteredProducts().length === 0) {
+        <div class="empty-state-box">
+          <p class="empty-message">No jerseys match your filters.</p>
+          <button type="button" (click)="resetFilters()" class="clear-filters-action">Clear all filters</button>
+        </div>
+      } @else {
+        <div class="products-grid">
+          @for (product of filteredProducts(); track product.id) {
+            <article class="product-card">
+              <a [routerLink]="['/products', product.id]" class="product-card-link">
+                <!-- Image Wrapper -->
+                <div class="product-image-box">
+                  <img
+                    [src]="product.imageUrl"
+                    [alt]="product.name"
+                    class="product-image"
+                    loading="lazy"
+                  />
+                </div>
+
+                <!-- Product Card Details -->
+                <div class="product-info-wrapper">
+                  <!-- Category & Team Tag -->
+                  <div class="product-tag">
+                    {{ product.categoryId === 'national-teams' ? 'National teams' : 'Clubs' }} · {{ product.team }}
+                  </div>
+
+                  <!-- Product Name -->
+                  <h3 class="product-title">{{ product.name }}</h3>
+
+                  <!-- Price & Stock Row -->
+                  <div class="product-price-row">
+                    <span class="product-price">{{ product.price | xaf }}</span>
+                    @if (product.stockQuantity > 0) {
+                      <span class="stock-badge in-stock">In stock</span>
+                    } @else {
+                      <span class="stock-badge out-stock">Sold out</span>
+                    }
+                  </div>
+
+                  <!-- Sizes Available & View Link -->
+                  <div class="product-footer-row">
+                    <span class="sizes-text">{{ formatSizesList(product) }}</span>
+                    <span class="view-link">View jersey <span class="arrow">↗</span></span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          }
+        </div>
+
+        <div class="caught-up-footer">
+          <p>You're all caught up · {{ filteredProducts().length }} jerseys</p>
+        </div>
+      }
+    </main>
+  </div>
+</div>

@@ -1,0 +1,148 @@
+<div class="cart-page-container">
+  <!-- Page Header -->
+  <header class="cart-header">
+    <div class="kicker-tag">YOUR SELECTION</div>
+    <h1 class="cart-title">Your cart ({{ totalItemCount() }})</h1>
+    <p class="cart-subtitle">Check your sizes and quantities. Your next match-day look is nearly here.</p>
+  </header>
+
+  @if (items().length === 0) {
+    <!-- Empty Cart State -->
+    <div class="empty-cart-card">
+      <div class="empty-cart-icon-box">
+        <svg class="empty-cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+      </div>
+      <h2 class="empty-cart-title">Your cart is currently empty</h2>
+      <p class="empty-cart-desc">Looks like you haven't added any jerseys yet.</p>
+      <a routerLink="/" class="browse-jerseys-btn">Explore jerseys catalog →</a>
+    </div>
+  } @else {
+    <!-- Cart Content 2-Column Grid -->
+    <div class="cart-content-grid">
+      <!-- Left Column: Items List -->
+      <section class="cart-items-section">
+        <!-- List Header -->
+        <div class="items-list-header">
+          <span class="col-head-product">PRODUCT</span>
+          <span class="col-head-total">TOTAL / QUANTITY</span>
+        </div>
+
+        <div class="items-list">
+          @for (line of items(); track line.id) {
+            <article class="cart-item-row">
+              <!-- Item Left: Image & Details -->
+              <div class="item-left-cell">
+                <div class="item-thumbnail-box">
+                  <img [src]="line.imageUrl" [alt]="line.productName" class="item-thumbnail" />
+                </div>
+
+                <div class="item-meta">
+                  <h3 class="item-title">
+                    <a [routerLink]="['/products', line.productId]">{{ line.productName }}</a>
+                  </h3>
+                  <p class="item-subinfo">{{ line.categoryTag }} · Size {{ line.selectedSize }}</p>
+                  <p class="item-unit-price">{{ line.unitPrice | xaf }} each</p>
+
+                  <button
+                    type="button"
+                    (click)="removeItem(line.id)"
+                    class="remove-btn"
+                    title="Remove item from cart"
+                  >
+                    <svg class="trash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Remove</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Item Right: Line Total & Stepper -->
+              <div class="item-right-cell">
+                <div class="item-line-total">{{ line.lineTotal | xaf }}</div>
+
+                <div class="cart-stepper">
+                  <button
+                    type="button"
+                    (click)="updateQuantity(line.id, line.quantity - 1)"
+                    class="stepper-btn"
+                    aria-label="Decrease quantity"
+                  >
+                    –
+                  </button>
+                  <span class="stepper-val">{{ line.quantity }}</span>
+                  <button
+                    type="button"
+                    (click)="updateQuantity(line.id, line.quantity + 1)"
+                    class="stepper-btn"
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+
+        <!-- Footer Navigation Links -->
+        <div class="cart-nav-footer">
+          <a routerLink="/" class="continue-shopping-link">
+            <span class="back-arrow">←</span> Continue shopping
+          </a>
+          <p class="cart-size-tip">
+            Need another size? Remove the jersey and choose your size on its product page.
+          </p>
+        </div>
+      </section>
+
+      <!-- Right Column: Order Summary Card -->
+      <aside class="order-summary-column">
+        <div class="summary-card">
+          <h2 class="summary-title">Order summary</h2>
+
+          <div class="summary-line">
+            <span class="summary-label">Subtotal · {{ totalItemCount() }} {{ totalItemCount() === 1 ? 'jersey' : 'jerseys' }}</span>
+            <span class="summary-val">{{ subtotal() | xaf }}</span>
+          </div>
+
+          <div class="summary-line">
+            <span class="summary-label">Delivery · flat per order</span>
+            <span class="summary-val">{{ deliveryFee() | xaf }}</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total-row">
+            <span class="total-label">Total</span>
+            <span class="total-amount">{{ grandTotal() | xaf }}</span>
+          </div>
+
+          <p class="summary-delivery-note">No surprises. Delivery is charged once per order.</p>
+
+          <button
+            type="button"
+            (click)="goToCheckout()"
+            class="checkout-btn"
+          >
+            <span>Go to checkout</span>
+            <span class="btn-arrow">→</span>
+          </button>
+
+          <div class="cod-badge">
+            <svg class="cod-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+            <span>Cash on delivery available</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  }
+</div>
