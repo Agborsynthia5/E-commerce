@@ -93,13 +93,6 @@
         </a>
       </div>
     } @else {
-      <div class="sub-left customer-mode">
-        <span class="signed-in-text">Signed in as <strong>Alex</strong> / Customer</span>
-        <button type="button" (click)="toggleRole()" class="role-switch-btn" title="Switch between Customer and Owner views">
-          (Switch to Owner view)
-        </button>
-      </div>
-
       <div class="sub-right">
         <a routerLink="/cart" class="cart-summary-link">
           Cart ({{ cartCount() }}) · {{ cartTotalWithDelivery() | xaf }} incl. delivery

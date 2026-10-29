@@ -50,7 +50,7 @@ export class CartComponent {
         product,
         productName: product?.name ?? 'Football Jersey',
         categoryTag: (product?.categoryId === 'national-teams' ? 'National teams' : 'Clubs'),
-        imageUrl: product?.imageUrl ?? 'assets/jerseys/cameroon-home.svg',
+        imageUrl: product?.imageUrl ?? '/assets/jerseys/cameroon%20home.jpg',
         unitPrice,
         lineTotal: unitPrice * item.quantity,
       };

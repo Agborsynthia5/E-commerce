@@ -22,14 +22,14 @@ export class CheckoutComponent {
   private readonly orderService = inject(OrderService);
   private readonly router = inject(Router);
 
-  // Form Fields pre-filled matching wireframe
-  fullName = 'Alex Nsom';
-  phone = '+237 6 77 12 34 56';
-  email = 'alex.nsom@example.com';
-  street = '24 Rue de la Paix';
-  city = 'Douala';
-  neighbourhood = 'Akwa';
-  deliveryInstructions = 'Call on arrival. Entrance beside the pharmacy.';
+  // Form Fields default to Buea
+  fullName = 'Agbor Synthia';
+  phone = '+237 6 51 26 95 53';
+  email = 'agborsynthia5@gmail.com';
+  street = 'Bakweri Town';
+  city = 'Buea';
+  neighbourhood = 'Beside Frankfill School';
+  deliveryInstructions = 'Call on arrival.';
   paymentMethod: 'cash_on_delivery' = 'cash_on_delivery';
 
   readonly isSubmitting = signal(false);

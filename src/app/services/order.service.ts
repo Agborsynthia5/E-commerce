@@ -36,7 +36,7 @@ export class OrderService {
         id: `oi-${crypto.randomUUID().slice(0, 6)}`,
         productId: cartItem.productId,
         productName: prod?.name ?? 'Football Jersey',
-        productImageUrl: prod?.imageUrl ?? 'assets/jerseys/cameroon-home.svg',
+        productImageUrl: prod?.imageUrl ?? '/assets/jerseys/cameroon%20home.jpg',
         categoryName: prod?.categoryId === 'national-teams' ? 'National teams' : 'Clubs',
         selectedSize: cartItem.selectedSize,
         quantity: cartItem.quantity,

@@ -9,22 +9,42 @@ export interface CartLine {
   lineTotal: number;
 }
 
-export interface CartSummary {
-  count: number;
-  subtotal: number;
-  deliveryFee: number;
-  total: number;
-  formattedText: string;
-}
-
 export const FLAT_DELIVERY_FEE = 500;
+const STORAGE_KEY_CART = 'leedstore_cart';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartService {
-  private readonly itemsSubject = new BehaviorSubject<CartItem[]>([...MOCK_CART_ITEMS]);
+  private readonly itemsSubject = new BehaviorSubject<CartItem[]>(this.loadStoredCart());
   readonly items$ = this.itemsSubject.asObservable();
+
+  private loadStoredCart(): CartItem[] {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const stored = window.localStorage.getItem(STORAGE_KEY_CART);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not read cart from localStorage:', err);
+      }
+    }
+    return [...MOCK_CART_ITEMS];
+  }
+
+  private persistCart(items: CartItem[]): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        window.localStorage.setItem(STORAGE_KEY_CART, JSON.stringify(items));
+      } catch (err) {
+        console.warn('Could not save cart to localStorage:', err);
+      }
+    }
+  }
 
   addItem(productId: string, selectedSize: ProductSize, quantity = 1): void {
     if (quantity < 1) {
@@ -49,6 +69,7 @@ export class CartService {
     }
 
     this.itemsSubject.next(items);
+    this.persistCart(items);
   }
 
   updateQuantity(itemId: string, quantity: number): void {
@@ -61,14 +82,18 @@ export class CartService {
       item.id === itemId ? { ...item, quantity } : item,
     );
     this.itemsSubject.next(items);
+    this.persistCart(items);
   }
 
   removeItem(itemId: string): void {
-    this.itemsSubject.next(this.itemsSubject.value.filter((item) => item.id !== itemId));
+    const updated = this.itemsSubject.value.filter((item) => item.id !== itemId);
+    this.itemsSubject.next(updated);
+    this.persistCart(updated);
   }
 
   clearCart(): void {
     this.itemsSubject.next([]);
+    this.persistCart([]);
   }
 
   getCurrentItems(): CartItem[] {

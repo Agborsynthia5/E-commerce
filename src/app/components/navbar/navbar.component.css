@@ -165,19 +165,6 @@
   color: #6b7280;
 }
 
-.role-switch-btn {
-  color: #0f5132;
-  font-size: 0.75rem;
-  text-decoration: underline;
-  margin-left: 6px;
-  opacity: 0.8;
-  cursor: pointer;
-}
-
-.role-switch-btn:hover {
-  opacity: 1;
-}
-
 .storefront-link {
   font-weight: 600;
   color: #0f5132;

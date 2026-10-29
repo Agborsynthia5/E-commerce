@@ -29,7 +29,17 @@ export class ProductListComponent {
   readonly maxPrice = signal<number | null>(null);
   readonly sortBy = signal<'featured' | 'price-asc' | 'price-desc' | 'name-asc'>('featured');
 
-  readonly teamsList = ['Cameroon', 'Nigeria', 'France', 'Argentina', 'Madrid', 'Barcelona'];
+  // Dynamic teams list: updates automatically whenever new products are added!
+  readonly teamsList = computed(() => {
+    const list: string[] = [];
+    this.allProducts().forEach((p) => {
+      if (p.team && !list.includes(p.team)) {
+        list.push(p.team);
+      }
+    });
+    return list;
+  });
+
   readonly availableSizes: ProductSize[] = ['S', 'M', 'L', 'XL', 'XXL'];
 
   constructor() {
@@ -71,7 +81,7 @@ export class ProductListComponent {
       items = items.filter((p) => p.price <= maxP);
     }
 
-    // Search query filter
+    // Search query filter (matches name, team, category, or description)
     const query = this.searchTerm().trim().toLowerCase();
     if (query) {
       items = items.filter(

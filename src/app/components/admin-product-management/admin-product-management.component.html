@@ -7,15 +7,20 @@
       <p class="page-subtitle">Manage jerseys, size-level stock and incoming orders in one place.</p>
     </div>
 
-    <button type="button" (click)="openAddModal()" class="add-product-btn">
-      <span class="plus-sign">+</span> Add product
-    </button>
+    <div class="header-action-buttons">
+      <button type="button" (click)="resetDemoData()" class="reset-data-btn" title="Reset products to initial mock data">
+        Reset to defaults
+      </button>
+      <a routerLink="/admin/products/new" class="add-product-btn">
+        <span class="plus-sign">+</span> Add product
+      </a>
+    </div>
   </header>
 
   <!-- Informational Callout (Wireframe Exact) -->
   <div class="demo-info-banner">
     <span class="banner-icon">ⓘ</span>
-    <span>Sample inventory and orders for demonstration — not live business metrics.</span>
+    <span>Sample inventory and orders for demonstration — not live business metrics. Changes persist in your browser!</span>
   </div>
 
   <!-- Tabs Row -->
@@ -124,14 +129,16 @@
 
               <!-- Status -->
               <td class="td-status">
-                <span class="status-badge active-badge">Active</span>
+                <span class="status-badge active-badge" [class.inactive]="product.status === 'inactive'">
+                  {{ product.status === 'inactive' ? 'Inactive' : 'Active' }}
+                </span>
               </td>
 
               <!-- Actions -->
               <td class="td-actions">
-                <button type="button" (click)="openEditModal(product)" class="edit-link-btn">
+                <a [routerLink]="['/admin/products', product.id, 'edit']" class="edit-link-btn">
                   Edit <span class="arrow">↗</span>
-                </button>
+                </a>
               </td>
             </tr>
           }
@@ -141,7 +148,7 @@
       <!-- Table Footer Line (Wireframe Exact) -->
       <div class="table-summary-footer">
         <span class="footer-left">Showing all {{ filteredProducts().length }} products · Prices fixed at XAF 6,000</span>
-        <span class="footer-right">Cameroon XXL is out of stock.</span>
+        <span class="footer-right">Real-time local storage persistence enabled.</span>
       </div>
     </div>
   }
@@ -205,70 +212,81 @@
     </div>
   }
 
-  <!-- Add / Edit Product Modal -->
-  @if (isModalOpen()) {
-    <div class="modal-backdrop" (click)="closeModal()">
+  <!-- Order Details Modal -->
+  @if (isOrderModalOpen() && selectedOrder(); as ord) {
+    <div class="modal-backdrop" (click)="closeOrderModal()">
       <div class="modal-dialog" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2 class="modal-title">{{ editingProduct() ? 'Edit Jersey Listing' : 'Add New Jersey' }}</h2>
-          <button type="button" (click)="closeModal()" class="close-modal-btn">✕</button>
+          <div>
+            <h2 class="modal-title">Order Details: {{ ord.referenceNumber }}</h2>
+            <p class="order-modal-sub">{{ ord.customerName }} · {{ ord.createdAt | date:'d MMM yyyy, HH:mm' }}</p>
+          </div>
+          <button type="button" (click)="closeOrderModal()" class="close-modal-btn">✕</button>
         </div>
 
-        <form (ngSubmit)="saveProduct()" class="modal-form">
-          <div class="modal-field-row">
-            <div class="field-item">
-              <label class="modal-label">Jersey Name *</label>
-              <input type="text" [(ngModel)]="formName" name="name" required class="modal-input" />
-            </div>
-
-            <div class="field-item">
-              <label class="modal-label">Team / Club *</label>
-              <input type="text" [(ngModel)]="formTeam" name="team" required class="modal-input" />
+        <div class="order-modal-body">
+          <div class="order-status-control-bar">
+            <span class="status-control-label">Update Status:</span>
+            <div class="status-actions-group">
+              <button
+                type="button"
+                [class.active-status]="ord.status === 'pending'"
+                (click)="updateOrderStatus(ord.id, 'pending')"
+                class="status-choice-btn pending-btn"
+              >
+                Pending
+              </button>
+              <button
+                type="button"
+                [class.active-status]="ord.status === 'out_for_delivery'"
+                (click)="updateOrderStatus(ord.id, 'out_for_delivery')"
+                class="status-choice-btn delivery-btn"
+              >
+                Out for delivery
+              </button>
+              <button
+                type="button"
+                [class.active-status]="ord.status === 'delivered'"
+                (click)="updateOrderStatus(ord.id, 'delivered')"
+                class="status-choice-btn delivered-btn"
+              >
+                Delivered
+              </button>
             </div>
           </div>
 
-          <div class="modal-field-row">
-            <div class="field-item">
-              <label class="modal-label">Category *</label>
-              <select [(ngModel)]="formCategoryId" name="category" class="modal-input">
-                <option value="national-teams">National teams</option>
-                <option value="clubs">Clubs</option>
-              </select>
-            </div>
-
-            <div class="field-item">
-              <label class="modal-label">Price (XAF) *</label>
-              <input type="number" [(ngModel)]="formPrice" name="price" required class="modal-input" />
-            </div>
+          <div class="order-modal-section">
+            <h3 class="section-micro-title">Delivery Info</h3>
+            <p>{{ ord.customerName }} ({{ ord.customerPhone }})</p>
+            <p>{{ ord.address.street }}, {{ ord.address.neighbourhood }}, {{ ord.address.city }}</p>
+            @if (ord.address.instructions) {
+              <p class="instructions-note"><em>Note: {{ ord.address.instructions }}</em></p>
+            }
           </div>
 
-          <div class="field-item full-width">
-            <label class="modal-label">Image Asset URL / Path *</label>
-            <input type="text" [(ngModel)]="formImageUrl" name="imageUrl" required class="modal-input" />
-          </div>
-
-          <div class="field-item full-width">
-            <label class="modal-label">Description</label>
-            <textarea [(ngModel)]="formDescription" name="description" rows="2" class="modal-textarea"></textarea>
-          </div>
-
-          <!-- Stock per size breakdown -->
-          <div class="sizes-stock-section">
-            <label class="modal-label">Inventory Units per Size</label>
-            <div class="sizes-stock-grid">
-              <div class="stock-input-item">
-                <span class="size-tag">S</span>
-                <input type="number" [(ngModel)]="formStockS" name="stockS" min="0" class="mini-stock-input" />
+          <div class="order-modal-section">
+            <h3 class="section-micro-title">Items Breakdown</h3>
+            @for (item of ord.items; track item.id) {
+              <div class="order-modal-item">
+                <span>{{ item.productName }} (Size {{ item.selectedSize }}) × {{ item.quantity }}</span>
+                <strong>{{ item.lineTotal | xaf }}</strong>
               </div>
-              <div class="stock-input-item">
-                <span class="size-tag">M</span>
-                <input type="number" [(ngModel)]="formStockM" name="stockM" min="0" class="mini-stock-input" />
-              </div>
-              <div class="stock-input-item">
-                <span class="size-tag">L</span>
-                <input type="number" [(ngModel)]="formStockL" name="stockL" min="0" class="mini-stock-input" />
-              </div>
-              <div class="stock-input-item">
-                <span class="size-tag">XL</span>
-                <input type="number" [(ngModel)]="formStockXL" name="stockXL" min="0" class="mini-stock-input" />
- 
+            }
+            <div class="order-modal-item delivery-fee-line">
+              <span>Delivery Fee</span>
+              <span>{{ ord.deliveryFee | xaf }}</span>
+            </div>
+            <div class="order-modal-item total-fee-line">
+              <strong>Total Cash on Delivery</strong>
+              <strong>{{ ord.totalAmount | xaf }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeOrderModal()" class="primary-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

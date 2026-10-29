@@ -3,7 +3,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { XafPipe } from '../../pipes/xaf-currency.pipe';
-import { AuthService } from '../../services/auth.service';
 import { CartService, FLAT_DELIVERY_FEE } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 
@@ -16,13 +15,8 @@ import { ProductService } from '../../services/product.service';
 })
 export class NavbarComponent {
   private readonly cartService = inject(CartService);
-  private readonly productService = inject(ProductService);
-  private readonly authService = inject(AuthService);
+  private readonly productService    = inject(ProductService);
   private readonly router = inject(Router);
-
-  readonly currentUser = toSignal(this.authService.currentUser$, {
-    initialValue: this.authService.getCurrentUser(),
-  });
 
   readonly cartCount = toSignal(this.cartService.getItemCount(), {
     initialValue: 0,
@@ -52,7 +46,4 @@ export class NavbarComponent {
     return this.router.url.startsWith('/admin');
   });
 
-  toggleRole(): void {
-    this.authService.switchUser();
-  }
 }

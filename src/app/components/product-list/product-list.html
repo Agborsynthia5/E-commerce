@@ -88,7 +88,7 @@
       <!-- Team Filter -->
       <div class="filter-group">
         <h3 class="filter-group-title">Team</h3>
-        @for (team of teamsList; track team) {
+        @for (team of teamsList(); track team) {
           <label class="filter-checkbox-row">
             <input
               type="checkbox"

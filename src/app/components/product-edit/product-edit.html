@@ -1,0 +1,346 @@
+<div class="edit-page-container">
+  <!-- Breadcrumbs & Header -->
+  <nav class="breadcrumb-bar">
+    <span class="bread-kicker">OWNER / PRODUCTS / EDIT</span>
+  </nav>
+
+  <header class="page-title-row">
+    <div>
+      <h1 class="main-heading">{{ isNew() ? 'Add new jersey' : 'Edit product' }}</h1>
+      <p class="heading-subtitle">
+        {{ name() }} · The same form is used to add or update jersey inventory.
+      </p>
+    </div>
+
+    <a routerLink="/admin/products" class="back-btn">
+      <span class="arrow">←</span> Back to products
+    </a>
+  </header>
+
+  <!-- 2-Column Layout -->
+  <div class="form-columns-grid">
+    <!-- Left Column: Form Sections -->
+    <div class="form-left-column">
+      <!-- Section 1: Product Information -->
+      <section class="edit-section">
+        <h2 class="section-title">01 / Product information</h2>
+
+        <div class="form-field">
+          <label class="field-label">Product name *</label>
+          <input
+            type="text"
+            [value]="name()"
+            (input)="name.set($any($event.target).value)"
+            required
+            class="text-input"
+          />
+        </div>
+
+        <div class="two-col-row">
+          <div class="form-field">
+            <label class="field-label">Category *</label>
+            <select
+              [value]="categoryId()"
+              (change)="categoryId.set($any($event.target).value)"
+              class="select-input"
+            >
+              <option value="national-teams">National teams</option>
+              <option value="clubs">Clubs</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">Price (XAF)</label>
+            <div class="price-locked-wrapper">
+              <input
+                type="number"
+                [value]="price()"
+                (input)="price.set($any($event.target).value)"
+                class="text-input price-input"
+              />
+              <span class="lock-icon" title="Fixed store-wide price">🔒</span>
+            </div>
+            <span class="field-note">Store-wide fixed price for every jersey.</span>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Team *</label>
+          <input
+            type="text"
+            [value]="team()"
+            (input)="team.set($any($event.target).value)"
+            required
+            class="text-input"
+          />
+          <span class="field-note">Used by the team filter in the catalog.</span>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Product description *</label>
+          <textarea
+            [value]="description()"
+            (input)="description.set($any($event.target).value)"
+            rows="3"
+            class="textarea-input"
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">Material, fit & care</label>
+          <textarea
+            [value]="materialFitCare()"
+            (input)="materialFitCare.set($any($event.target).value)"
+            rows="2"
+            class="textarea-input"
+          ></textarea>
+        </div>
+      </section>
+
+      <!-- Section 2: Product Images -->
+      <section class="edit-section">
+        <div class="section-head-split">
+          <h2 class="section-title">02 / Product images</h2>
+          <span class="images-counter">{{ galleryImages().length }} images</span>
+        </div>
+        <p class="section-hint">Upload multiple views. Drag handles or use arrows to reorder. The first image is the cover.</p>
+
+        <!-- Images Grid -->
+        <div class="images-list-grid">
+          @for (img of galleryImages(); track $index) {
+            <div class="image-manage-card">
+              <div class="img-preview-box">
+                <img [src]="img.url" [alt]="img.label" class="manage-thumb" />
+              </div>
+
+              <div class="card-caption-bar">
+                <span class="caption-tag">{{ img.label }}</span>
+              </div>
+
+              <div class="reorder-controls">
+                <span class="drag-handle" title="Drag to reorder">::</span>
+                <div class="arrows-group">
+                  <button
+                    type="button"
+                    (click)="moveImageLeft($index)"
+                    [disabled]="$index === 0"
+                    class="arrow-btn"
+                    title="Move left"
+                  >
+                    ←
+                  </button>
+                  <button
+                    type="button"
+                    (click)="moveImageRight($index)"
+                    [disabled]="$index === galleryImages().length - 1"
+                    class="arrow-btn"
+                    title="Move right"
+                  >
+                    →
+                  </button>
+                  <button
+                    type="button"
+                    (click)="removeImage($index)"
+                    class="trash-btn"
+                    title="Delete image"
+                  >
+                    🗑
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <input
+          #imageFileInput
+          id="product-images"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          class="file-input"
+          (change)="handleImageInput($event)"
+        />
+        <button
+          type="button"
+          class="upload-dropzone"
+          [class.dragging]="isDraggingImages()"
+          [disabled]="isUploadingImages()"
+          (click)="openImagePicker()"
+          (dragover)="handleImageDragOver($event)"
+          (dragleave)="handleImageDragLeave($event)"
+          (drop)="handleImageDrop($event)"
+        >
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span class="dropzone-text">
+            {{ isUploadingImages() ? 'Preparing images…' : 'Drop images here or choose files' }}
+          </span>
+          <span class="dropzone-sub">JPG, PNG or WebP · Up to 5 MB each</span>
+        </button>
+        @if (imageUploadMessage()) {
+          <p class="upload-feedback" role="status">{{ imageUploadMessage() }}</p>
+        }
+        @if (imageUploadError()) {
+          <p class="upload-error" role="alert">{{ imageUploadError() }}</p>
+        }
+      </section>
+
+      <!-- Section 3: Sizes & Stock -->
+      <section class="edit-section">
+        <div class="section-head-split">
+          <h2 class="section-title">03 / Sizes & stock</h2>
+          <span class="stock-pill">{{ totalStock() }} units total</span>
+        </div>
+        <p class="section-hint">Enter available units for each size. Zero stock makes that size unavailable to shoppers.</p>
+
+        <div class="sizes-inputs-row">
+          <div class="size-field">
+            <span class="size-letter">S</span>
+            <input
+              type="number"
+              [value]="stockS()"
+              (input)="stockS.set($any($event.target).value)"
+              min="0"
+              class="stock-num-input"
+            />
+          </div>
+
+          <div class="size-field">
+            <span class="size-letter">M</span>
+            <input
+              type="number"
+              [value]="stockM()"
+              (input)="stockM.set($any($event.target).value)"
+              min="0"
+              class="stock-num-input"
+            />
+          </div>
+
+          <div class="size-field">
+            <span class="size-letter">L</span>
+            <input
+              type="number"
+              [value]="stockL()"
+              (input)="stockL.set($any($event.target).value)"
+              min="0"
+              class="stock-num-input"
+            />
+          </div>
+
+          <div class="size-field">
+            <span class="size-letter">XL</span>
+            <input
+              type="number"
+              [value]="stockXL()"
+              (input)="stockXL.set($any($event.target).value)"
+              min="0"
+              class="stock-num-input"
+            />
+          </div>
+
+          <div class="size-field">
+            <span class="size-letter">XXL</span>
+            <input
+              type="number"
+              [value]="stockXXL()"
+              (input)="stockXXL.set($any($event.target).value)"
+              min="0"
+              class="stock-num-input"
+            />
+          </div>
+        </div>
+
+        <p class="stock-hint-line">
+          @if (stockXXL() <= 0) {
+            XXL will appear sold out. M has {{ stockM() }} units available.
+          } @else {
+            All sizes have active inventory.
+          }
+        </p>
+      </section>
+
+      <!-- Bottom Form Actions -->
+      <div class="form-bottom-actions">
+        <a routerLink="/admin/products" class="cancel-link-btn">Cancel changes</a>
+        <button type="button" (click)="saveProduct()" class="save-product-btn">
+          <span>Save product</span>
+          <span class="check">✓</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column: Sidebar Previews & Visibility -->
+    <aside class="sidebar-right-column">
+      <!-- Card 1: Storefront Preview -->
+      <div class="preview-card">
+        <div class="preview-card-head">
+          <span class="preview-title">Storefront preview</span>
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+
+        <div class="live-jersey-card">
+          <div class="preview-img-container">
+            <img [src]="coverImage()" [alt]="name()" class="live-card-img" />
+          </div>
+
+          <div class="live-card-body">
+            <span class="live-tag">
+              {{ categoryId() === 'national-teams' ? 'National teams' : 'Clubs' }} · {{ team() }}
+            </span>
+            <h3 class="live-name">{{ name() }}</h3>
+            <div class="live-price">{{ price() | xaf }}</div>
+            <span class="live-sizes">{{ availableSizesSummary() }}</span>
+
+            <button type="button" class="preview-page-btn">
+              <span>Preview product page</span>
+              <span class="arrow">↗</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Product Visibility -->
+      <div class="visibility-card">
+        <div class="visibility-row">
+          <div>
+            <h3 class="vis-heading">Product visibility</h3>
+            <span class="vis-sublabel">Active in storefront</span>
+          </div>
+
+          <!-- Switch Toggle -->
+          <button
+            type="button"
+            (click)="toggleVisibility()"
+            class="switch-toggle"
+            [class.on]="isActive()"
+            aria-label="Toggle active status"
+          >
+            <span class="toggle-circle"></span>
+          </button>
+        </div>
+
+        <p class="vis-note">
+          Inactive products stay in your inventory but are hidden from the catalog.
+        </p>
+        <p class="vis-subnote">
+          Save applies product details, ordered gallery images, and size-level stock together.
+        </p>
+      </div>
+
+      <!-- Card 3: Keep it Clear Tip Box -->
+      <div class="tip-box">
+        <h4 class="tip-title">Keep it clear.</h4>
+        <p class="tip-text">
+          Use a front view as the cover, a back view and a close-up. Describe the fabric, fit and care.
+        </p>
+      </div>
+    </aside>
+  </div>
+</div>

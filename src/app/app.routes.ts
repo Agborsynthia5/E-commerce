@@ -5,6 +5,7 @@ import { CartComponent } from './components/cart/cart';
 import { CheckoutComponent } from './components/checkout/checkout';
 import { OrderConfirmationComponent } from './components/order-confirmation/order-confirmation';
 import { ProductDetailComponent } from './components/product-detail/product-detail';
+import { ProductEditComponent } from './components/product-edit/product-edit';
 import { ProductListComponent } from './components/product-list/product-list';
 
 export const routes: Routes = [
@@ -15,6 +16,8 @@ export const routes: Routes = [
   { path: 'order-confirmation/:id', component: OrderConfirmationComponent, title: 'LEEDSTORE | Order Confirmed' },
   { path: 'admin', component: AdminDashboardComponent, title: 'LEEDSTORE | Store Owner Overview' },
   { path: 'admin/products', component: AdminProductManagementComponent, title: 'LEEDSTORE | Store Management' },
+  { path: 'admin/products/new', component: ProductEditComponent, title: 'LEEDSTORE | Add Product' },
+  { path: 'admin/products/:id/edit', component: ProductEditComponent, title: 'LEEDSTORE | Edit Product' },
   { path: 'admin/orders', component: AdminProductManagementComponent, title: 'LEEDSTORE | Order Management' },
   { path: '**', redirectTo: '' },
 ];

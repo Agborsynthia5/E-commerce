@@ -9,7 +9,7 @@
   <!-- Checkout Header -->
   <header class="checkout-header">
     <h1 class="checkout-title">Make it yours.</h1>
-    <p class="checkout-subtitle">Confirm your delivery details and place your order. Pay when it arrives.</p>
+    <p class="checkout-subtitle">Enter your contact and delivery details to place your order. Pay when it arrives.</p>
   </header>
 
   <!-- Error Alert if any -->
@@ -22,12 +22,12 @@
   <!-- Main 2-Column Grid -->
   <div class="checkout-columns-grid">
     <!-- Left Column: Checkout Form -->
-    <form (ngSubmit)="onSubmitOrder()" class="checkout-form-column">
+    <form id="checkout-form" (ngSubmit)="onSubmitOrder()" class="checkout-form-column">
       <!-- Section 1: Contact -->
       <section class="form-section">
         <div class="section-header">
           <h2 class="section-title">01 / Contact</h2>
-          <p class="section-subtitle">Ordering as Alex N. · Signed-in customer</p>
+          <p class="section-subtitle">Enter your details as a guest. No account is needed.</p>
         </div>
 
         <div class="form-row-two-col">
@@ -219,8 +219,8 @@
 
         <!-- Place Order Button -->
         <button
-          type="button"
-          (click)="onSubmitOrder()"
+          type="submit"
+          form="checkout-form"
           [disabled]="isSubmitting() || items().length === 0"
           class="place-order-btn"
         >
