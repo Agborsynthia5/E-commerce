@@ -17,8 +17,11 @@
   <!-- Informational Callout (Wireframe Exact) -->
   <div class="demo-info-banner">
     <span class="banner-icon">ⓘ</span>
-    <span>Sample inventory and orders for demonstration — not live business metrics. Changes persist in your browser!</span>
+    <span>Sample orders are for demonstration. Product changes are saved in this browser on this device and are not shared across devices.</span>
   </div>
+  @if (operationError()) {
+    <p class="operation-error" role="alert">{{ operationError() }}</p>
+  }
 
   <!-- Tabs Row -->
   <div class="management-tabs">

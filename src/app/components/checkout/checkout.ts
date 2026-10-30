@@ -74,7 +74,7 @@ export class CheckoutComponent {
     return this.subtotal() + this.deliveryFee();
   });
 
-  onSubmitOrder(): void {
+  async onSubmitOrder(): Promise<void> {
     if (!this.fullName || !this.phone || !this.email || !this.street || !this.city || !this.neighbourhood) {
       this.errorMessage.set('Please fill in all required contact and delivery address fields.');
       return;
@@ -98,10 +98,15 @@ export class CheckoutComponent {
       instructions: this.deliveryInstructions,
     };
 
-    setTimeout(() => {
-      const order = this.orderService.placeOrder(address, this.paymentMethod);
-      this.isSubmitting.set(false);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      const order = await this.orderService.placeOrder(address, this.paymentMethod);
       this.router.navigate(['/order-confirmation', order.id]);
-    }, 600);
+    } catch (error) {
+      console.error('Could not complete order:', error);
+      this.errorMessage.set('Could not save your order changes. Please try again.');
+    } finally {
+      this.isSubmitting.set(false);
+    }
   }
 }

@@ -29,6 +29,8 @@ export class ProductListComponent {
   readonly maxPrice = signal<number | null>(null);
   readonly sortBy = signal<'featured' | 'price-asc' | 'price-desc' | 'name-asc'>('featured');
 
+  private routeCategory: string | null = null;
+
   // Dynamic teams list: updates automatically whenever new products are added!
   readonly teamsList = computed(() => {
     const list: string[] = [];
@@ -44,8 +46,21 @@ export class ProductListComponent {
 
   constructor() {
     this.route.queryParams.subscribe((params) => {
-      if (params['category']) {
-        this.selectedCategory.set(params['category']);
+      const requestedCategory = params['category'] ?? 'all';
+      const category =
+        requestedCategory === 'national-teams' ||
+        requestedCategory === 'clubs' ||
+        requestedCategory === 'all-jerseys'
+          ? requestedCategory
+          : 'all';
+
+      if (category !== this.routeCategory) {
+        this.routeCategory = category;
+        this.selectedCategory.set(category);
+        this.selectedTeams.set([]);
+        this.selectedSize.set(null);
+        this.maxPrice.set(null);
+        this.searchTerm.set('');
       }
       if (params['focusSearch']) {
         setTimeout(() => this.searchInputElement?.nativeElement.focus(), 100);

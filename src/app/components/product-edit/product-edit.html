@@ -264,10 +264,13 @@
       </section>
 
       <!-- Bottom Form Actions -->
+      @if (saveError()) {
+        <p class="save-error" role="alert">{{ saveError() }}</p>
+      }
       <div class="form-bottom-actions">
         <a routerLink="/admin/products" class="cancel-link-btn">Cancel changes</a>
-        <button type="button" (click)="saveProduct()" class="save-product-btn">
-          <span>Save product</span>
+        <button type="button" (click)="saveProduct()" class="save-product-btn" [disabled]="isSaving()">
+          <span>{{ isSaving() ? 'Saving…' : 'Save product' }}</span>
           <span class="check">✓</span>
         </button>
       </div>

@@ -4,6 +4,10 @@ import { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../data/mock-data';
 import { Category, Product, ProductSize } from '../models';
 
 const STORAGE_KEY_PRODUCTS = 'leedstore_products';
+const DATABASE_NAME_PRODUCTS = 'leedstore';
+const DATABASE_VERSION_PRODUCTS = 1;
+const DATABASE_STORE_PRODUCTS = 'products';
+const DATABASE_RECORD_PRODUCTS = 'inventory';
 const LEGACY_IMAGE_URLS: Record<string, string> = {
   'assets/jerseys/cameroon-home.svg': '/assets/jerseys/cameroon%20home.jpg',
   'assets/jerseys/cameroon-back.svg': '/assets/jerseys/backview%20cameroon%20home.jpg',
@@ -20,50 +24,129 @@ const LEGACY_IMAGE_URLS: Record<string, string> = {
   providedIn: 'root',
 })
 export class ProductService {
-  private readonly productsSubject = new BehaviorSubject<Product[]>(this.loadStoredProducts());
+  private readonly storedProducts = this.readStoredProducts();
+  private readonly productsSubject = new BehaviorSubject<Product[]>(
+    this.storedProducts ?? [...MOCK_PRODUCTS],
+  );
   readonly products$ = this.productsSubject.asObservable();
 
   private readonly categoriesSubject = new BehaviorSubject<Category[]>([...MOCK_CATEGORIES]);
   readonly categories$ = this.categoriesSubject.asObservable();
+  private readonly persistenceReady = this.initializePersistence();
+  private pendingWrite: Promise<void> = Promise.resolve();
+  private productsRevision = 0;
 
   constructor() {
+    void this.persistenceReady.catch((error) =>
+      console.error('Could not initialize product storage:', error),
+    );
     this.refreshCategoryCounts();
   }
 
-  private loadStoredProducts(): Product[] {
+  private readStoredProducts(): Product[] | null {
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
         const stored = window.localStorage.getItem(STORAGE_KEY_PRODUCTS);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map((product: Product) => ({
-              ...product,
-              imageUrl: LEGACY_IMAGE_URLS[product.imageUrl] ?? product.imageUrl,
-              gallery: Array.isArray(product.gallery)
-                ? product.gallery.map((image) => ({
-                    ...image,
-                    url: LEGACY_IMAGE_URLS[image.url] ?? image.url,
-                  }))
-                : product.gallery,
-            }));
+          if (Array.isArray(parsed)) {
+            return this.normalizeProducts(parsed);
           }
         }
       } catch (err) {
         console.warn('Could not read products from localStorage:', err);
       }
     }
-    return [...MOCK_PRODUCTS];
+    return null;
   }
 
-  private persistProducts(products: Product[]): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      try {
-        window.localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
-      } catch (err) {
-        console.warn('Could not save products to localStorage:', err);
-      }
+  private normalizeProducts(products: Product[]): Product[] {
+    return products.map((product) => ({
+      ...product,
+      imageUrl: LEGACY_IMAGE_URLS[product.imageUrl] ?? product.imageUrl,
+      gallery: Array.isArray(product.gallery)
+        ? product.gallery.map((image) => ({
+            ...image,
+            url: LEGACY_IMAGE_URLS[image.url] ?? image.url,
+          }))
+        : product.gallery,
+    }));
+  }
+
+  private async initializePersistence(): Promise<IDBDatabase | null> {
+    if (typeof window === 'undefined') {
+      return null;
     }
+    if (!window.indexedDB) {
+      return null;
+    }
+
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = window.indexedDB.open(DATABASE_NAME_PRODUCTS, DATABASE_VERSION_PRODUCTS);
+      request.onupgradeneeded = () => {
+        request.result.createObjectStore(DATABASE_STORE_PRODUCTS);
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error ?? new Error('Could not open product storage.'));
+      request.onblocked = () => reject(new Error('Product storage is blocked by another browser tab.'));
+    });
+
+    const savedProducts = await this.readFromDatabase(database);
+    if (savedProducts !== null) {
+      if (this.productsRevision === 0) {
+        this.productsSubject.next(this.normalizeProducts(savedProducts));
+        this.refreshCategoryCounts();
+      }
+    } else if (this.storedProducts !== null || this.productsRevision > 0) {
+      await this.writeToDatabase(database, this.productsSubject.value);
+    }
+
+    return database;
+  }
+
+  private readFromDatabase(database: IDBDatabase): Promise<Product[] | null> {
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(DATABASE_STORE_PRODUCTS, 'readonly');
+      const request = transaction.objectStore(DATABASE_STORE_PRODUCTS).get(DATABASE_RECORD_PRODUCTS);
+      let products: Product[] | null = null;
+      request.onsuccess = () => {
+        if (Array.isArray(request.result)) {
+          products = request.result as Product[];
+        }
+      };
+      transaction.oncomplete = () => resolve(products);
+      transaction.onerror = () =>
+        reject(transaction.error ?? new Error('Could not read saved products.'));
+      transaction.onabort = () =>
+        reject(transaction.error ?? new Error('Reading saved products was interrupted.'));
+    });
+  }
+
+  private writeToDatabase(database: IDBDatabase, products: Product[]): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(DATABASE_STORE_PRODUCTS, 'readwrite', {
+        durability: 'strict',
+      });
+      transaction.objectStore(DATABASE_STORE_PRODUCTS).put(products, DATABASE_RECORD_PRODUCTS);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () =>
+        reject(transaction.error ?? new Error('Could not save products.'));
+      transaction.onabort = () =>
+        reject(transaction.error ?? new Error('Saving products was interrupted.'));
+    });
+  }
+
+  private persistProducts(products: Product[]): Promise<void> {
+    const write = this.pendingWrite.then(async () => {
+      const database = await this.persistenceReady;
+      if (database) {
+        await this.writeToDatabase(database, products);
+      } else if (typeof window !== 'undefined') {
+        window.localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+      }
+    });
+    this.pendingWrite = write.catch(() => undefined);
+    return write;
   }
 
   getProducts(): Observable<Product[]> {
@@ -95,7 +178,8 @@ export class ProductService {
     return this.categories$;
   }
 
-  addProduct(newProduct: Omit<Product, 'id'> & { id?: string }): Product {
+  async addProduct(newProduct: Omit<Product, 'id'> & { id?: string }): Promise<Product> {
+    await this.persistenceReady;
     const id = newProduct.id || `jersey-${newProduct.team.toLowerCase().replace(/\s+/g, '-')}-${Date.now().toString().slice(-4)}`;
     const product: Product = {
       ...newProduct,
@@ -105,13 +189,15 @@ export class ProductService {
     };
 
     const updated = [product, ...this.productsSubject.value];
+    await this.persistProducts(updated);
     this.productsSubject.next(updated);
-    this.persistProducts(updated);
+    this.productsRevision++;
     this.refreshCategoryCounts();
     return product;
   }
 
-  updateProduct(id: string, updates: Partial<Product>): void {
+  async updateProduct(id: string, updates: Partial<Product>): Promise<void> {
+    await this.persistenceReady;
     const products = this.productsSubject.value.map((product) => {
       if (product.id !== id) {
         return product;
@@ -124,19 +210,23 @@ export class ProductService {
       return updated;
     });
 
+    await this.persistProducts(products);
     this.productsSubject.next(products);
-    this.persistProducts(products);
+    this.productsRevision++;
     this.refreshCategoryCounts();
   }
 
-  deleteProduct(id: string): void {
+  async deleteProduct(id: string): Promise<void> {
+    await this.persistenceReady;
     const products = this.productsSubject.value.filter((p) => p.id !== id);
+    await this.persistProducts(products);
     this.productsSubject.next(products);
-    this.persistProducts(products);
+    this.productsRevision++;
     this.refreshCategoryCounts();
   }
 
-  updateStock(id: string, size: ProductSize, quantityDelta: number): void {
+  async updateStock(id: string, size: ProductSize, quantityDelta: number): Promise<void> {
+    await this.persistenceReady;
     const products = this.productsSubject.value.map((product) => {
       if (product.id !== id) {
         return product;
@@ -155,7 +245,8 @@ export class ProductService {
     });
 
     this.productsSubject.next(products);
-    this.persistProducts(products);
+    this.productsRevision++;
+    await this.persistProducts(products);
   }
 
   private refreshCategoryCounts(): void {

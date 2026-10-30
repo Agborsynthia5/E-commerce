@@ -37,6 +37,8 @@ export class ProductEditComponent {
   readonly isDraggingImages = signal(false);
   readonly imageUploadError = signal<string | null>(null);
   readonly imageUploadMessage = signal<string | null>(null);
+  readonly isSaving = signal(false);
+  readonly saveError = signal<string | null>(null);
 
   @ViewChild('imageFileInput') private imageFileInput?: ElementRef<HTMLInputElement>;
 
@@ -254,7 +256,14 @@ export class ProductEditComponent {
     this.isActive.update((v) => !v);
   }
 
-  saveProduct(): void {
+  async saveProduct(): Promise<void> {
+    if (this.isSaving()) {
+      return;
+    }
+
+    this.isSaving.set(true);
+    this.saveError.set(null);
+
     const stockBySize: Record<ProductSize, number> = {
       S: Number(this.stockS()) || 0,
       M: Number(this.stockM()) || 0,
@@ -274,9 +283,10 @@ export class ProductEditComponent {
 
     const gallery = this.galleryImages();
     const coverUrl = gallery[0]?.url || '/assets/jerseys/cameroon%20home.jpg';
+    const availableSizes: ProductSize[] = sizes.length ? sizes : ['M'];
 
-    if (this.isNew()) {
-      this.productService.addProduct({
+    try {
+      const product: Omit<Product, 'id'> = {
         name: this.name(),
         team: this.team(),
         categoryId: this.categoryId(),
@@ -286,25 +296,24 @@ export class ProductEditComponent {
         description: this.description(),
         stockBySize,
         stockQuantity: total,
-        sizes: sizes.length ? sizes : ['M'],
-        status: this.isActive() ? 'active' : 'inactive',
-      });
-    } else {
-      this.productService.updateProduct(this.productId(), {
-        name: this.name(),
-        team: this.team(),
-        categoryId: this.categoryId(),
-        price: Number(this.price()),
-        imageUrl: coverUrl,
-        gallery,
-        description: this.description(),
-        stockBySize,
-        stockQuantity: total,
-        sizes: sizes.length ? sizes : ['M'],
-        status: this.isActive() ? 'active' : 'inactive',
-      });
+        sizes: availableSizes,
+        status: this.isActive() ? 'active' as const : 'inactive' as const,
+      };
+
+      if (this.isNew()) {
+        await this.productService.addProduct(product);
+      } else {
+        await this.productService.updateProduct(this.productId(), product);
+      }
+
+      this.router.navigate(['/admin/products']);
+    } catch (error) {
+      console.error('Could not save product:', error);
+      this.saveError.set(
+        'Could not save this product on this device. Your changes are still on this screen; please try again.',
+      );
+    } finally {
+      this.isSaving.set(false);
     }
-
-    this.router.navigate(['/admin/products']);
   }
 }

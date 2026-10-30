@@ -17,6 +17,10 @@ npm run start
 
 Open [http://localhost:4200](http://localhost:4200). The app reloads when you change source files.
 
+## Product persistence
+
+Products added or changed in store management are saved to IndexedDB in the current browser and device. The app migrates existing product data from `localStorage` the first time it opens the new store. A product save completes before the form closes, and the form reports storage errors instead of showing a successful save. Clearing the browser's site data will still remove locally saved products; sharing inventory between devices requires a server-side database.
+
 ## Build and tests
 
 ```bash

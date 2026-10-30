@@ -25,6 +25,7 @@ export class AdminProductManagementComponent {
 
   // Tab: 'products' | 'orders'
   readonly activeTab = signal<'products' | 'orders'>('products');
+  readonly operationError = signal<string | null>(null);
 
   // Filters
   readonly searchTerm = signal('');
@@ -88,9 +89,15 @@ export class AdminProductManagementComponent {
     this.router.navigate(['/admin/products', product.id, 'edit']);
   }
 
-  deleteProduct(id: string): void {
+  async deleteProduct(id: string): Promise<void> {
     if (confirm('Are you sure you want to remove this jersey listing?')) {
-      this.productService.deleteProduct(id);
+      this.operationError.set(null);
+      try {
+        await this.productService.deleteProduct(id);
+      } catch (error) {
+        console.error('Could not delete product:', error);
+        this.operationError.set('Could not save this change on this device. Please try again.');
+      }
     }
   }
 

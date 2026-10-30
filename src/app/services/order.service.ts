@@ -25,7 +25,10 @@ export class OrderService {
     );
   }
 
-  placeOrder(address: OrderAddress, paymentMethod: 'cash_on_delivery' | 'online' = 'cash_on_delivery'): Order {
+  async placeOrder(
+    address: OrderAddress,
+    paymentMethod: 'cash_on_delivery' | 'online' = 'cash_on_delivery',
+  ): Promise<Order> {
     const cartItems = this.cartService.getCurrentItems();
     const products = this.productService.getSnapshot();
 
@@ -70,9 +73,11 @@ export class OrderService {
     };
 
     // Deduct stock
-    orderItems.forEach((item) => {
-      this.productService.updateStock(item.productId, item.selectedSize, -item.quantity);
-    });
+    await Promise.all(
+      orderItems.map((item) =>
+        this.productService.updateStock(item.productId, item.selectedSize, -item.quantity),
+      ),
+    );
 
     // Clear cart
     this.cartService.clearCart();

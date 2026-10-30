@@ -84,6 +84,12 @@
   font-weight: bold;
 }
 
+.operation-error {
+  color: #b91c1c;
+  font-size: 0.8125rem;
+  margin: -12px 0 20px;
+}
+
 /* Tabs */
 .management-tabs {
   display: flex;
