@@ -1,0 +1,182 @@
+/* ── Page background ─────────────────────────────────────────────────────── */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a2e1a 0%, #155235 50%, #1a6b42 100%);
+  padding: 1.5rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+.login-card {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Branding ────────────────────────────────────────────────────────────── */
+.brand {
+  text-align: center;
+}
+.brand-logo {
+  font-size: 2.5rem;
+}
+.brand-name {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #155235;
+  letter-spacing: 0.08em;
+  margin: 0.25rem 0 0;
+}
+.brand-sub {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0;
+}
+
+/* ── Form headings ───────────────────────────────────────────────────────── */
+.form-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 0.25rem;
+}
+.form-hint {
+  font-size: 0.82rem;
+  color: #666;
+  margin: 0 0 1rem;
+}
+
+/* ── Error banner ────────────────────────────────────────────────────────── */
+.error-banner {
+  background: #fff4f4;
+  border: 1px solid #f5c2c2;
+  border-radius: 0.5rem;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Fields ──────────────────────────────────────────────────────────────── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #333;
+}
+.field-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.6rem;
+  font-size: 0.95rem;
+  color: #111;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  background: #fafafa;
+}
+.field-input:focus {
+  outline: none;
+  border-color: #155235;
+  background: #fff;
+}
+
+/* ── Password wrapper ────────────────────────────────────────────────────── */
+.pass-wrapper {
+  position: relative;
+}
+.pass-wrapper .field-input {
+  padding-right: 2.8rem;
+}
+.toggle-pass {
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+}
+
+/* ── Submit button ───────────────────────────────────────────────────────── */
+.login-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: #155235;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.2s, opacity 0.2s;
+  margin-top: 0.25rem;
+}
+.login-btn:hover:not(:disabled) {
+  background: #0f3d26;
+}
+.login-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Back link ───────────────────────────────────────────────────────────── */
+.back-link {
+  text-align: center;
+  font-size: 0.82rem;
+  color: #777;
+  margin: 0;
+}
+.back-link a {
+  color: #155235;
+  font-weight: 600;
+  text-decoration: none;
+}
+.back-link a:hover {
+  text-decoration: underline;
+}

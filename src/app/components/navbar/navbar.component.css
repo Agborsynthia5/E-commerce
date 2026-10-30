@@ -202,3 +202,32 @@
     letter-spacing: 0.1em;
   }
 }
+
+/* -- Logout button ------------------------------------------------------- */
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+}
+.logout-btn:hover .icon {
+  color: #ff4444;
+}
+
+.logout-text-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 4px;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  letter-spacing: 0.05em;
+  transition: background 0.15s, color 0.15s;
+}
+.logout-text-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}

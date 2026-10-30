@@ -5,6 +5,7 @@ import { combineLatest } from 'rxjs';
 import { XafPipe } from '../../pipes/xaf-currency.pipe';
 import { CartService, FLAT_DELIVERY_FEE } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -14,9 +15,10 @@ import { ProductService } from '../../services/product.service';
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
-  private readonly cartService = inject(CartService);
-  private readonly productService    = inject(ProductService);
-  private readonly router = inject(Router);
+  private readonly cartService    = inject(CartService);
+  private readonly productService = inject(ProductService);
+  private readonly router         = inject(Router);
+  readonly authService            = inject(AuthService);
 
   readonly cartCount = toSignal(this.cartService.getItemCount(), {
     initialValue: 0,
@@ -46,4 +48,7 @@ export class NavbarComponent {
     return this.router.url.startsWith('/admin');
   });
 
+  logout(): void {
+    this.authService.logout();
+  }
 }

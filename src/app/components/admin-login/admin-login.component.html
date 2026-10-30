@@ -1,0 +1,77 @@
+<section class="login-page">
+
+  <!-- Logo / branding -->
+  <div class="login-card">
+
+    <div class="brand">
+      <span class="brand-logo">⚽</span>
+      <h1 class="brand-name">LEEDSTORE</h1>
+      <p class="brand-sub">Store Owner Access</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate class="login-form">
+
+      <h2 class="form-title">Sign in to your dashboard</h2>
+      <p class="form-hint">Only the store owner can access this area.</p>
+
+      <!-- Error banner -->
+      @if (errorMsg()) {
+        <div class="error-banner" role="alert">
+          <span class="error-icon">⚠️</span>
+          {{ errorMsg() }}
+        </div>
+      }
+
+      <!-- Username -->
+      <div class="field-group">
+        <label for="username" class="field-label">Username</label>
+        <input
+          id="username"
+          type="text"
+          class="field-input"
+          placeholder="Enter your username"
+          [(ngModel)]="username"
+          name="username"
+          autocomplete="username"
+          required
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="field-group">
+        <label for="password" class="field-label">Password</label>
+        <div class="pass-wrapper">
+          <input
+            id="password"
+            [type]="showPass() ? 'text' : 'password'"
+            class="field-input"
+            placeholder="Enter your password"
+            [(ngModel)]="password"
+            name="password"
+            autocomplete="current-password"
+            required
+          />
+          <button type="button" class="toggle-pass" (click)="togglePassword()" aria-label="Toggle password visibility">
+            {{ showPass() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="login-btn" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span class="spinner"></span> Checking...
+        } @else {
+          🔐 Sign In
+        }
+      </button>
+
+    </form>
+
+    <p class="back-link">
+      <a routerLink="/">← Back to the store</a>
+    </p>
+
+  </div>
+
+</section>

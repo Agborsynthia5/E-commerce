@@ -158,14 +158,6 @@ export class ProductService {
     this.persistProducts(products);
   }
 
-  resetToDefault(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.removeItem(STORAGE_KEY_PRODUCTS);
-    }
-    this.productsSubject.next([...MOCK_PRODUCTS]);
-    this.refreshCategoryCounts();
-  }
-
   private refreshCategoryCounts(): void {
     const products = this.productsSubject.value;
     const categories = this.categoriesSubject.value.map((cat) => {

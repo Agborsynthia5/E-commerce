@@ -110,10 +110,4 @@ export class AdminProductManagementComponent {
       this.selectedOrder.update((o) => (o ? { ...o, status } : null));
     }
   }
-
-  resetDemoData(): void {
-    if (confirm('Reset catalog inventory and demonstration records back to default?')) {
-      this.productService.resetToDefault();
-    }
-  }
 }

@@ -37,14 +37,17 @@
         <span class="active-dot"></span>
       </a>
 
-      <a
-        routerLink="/admin"
-        routerLinkActive="active"
-        class="nav-link"
-      >
-        Store management
-        <span class="active-dot"></span>
-      </a>
+      <!-- Only show "Store management" link if owner is logged in -->
+      @if (authService.isLoggedIn) {
+        <a
+          routerLink="/admin"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          Store management
+          <span class="active-dot"></span>
+        </a>
+      }
     </nav>
 
     <!-- Center Brand Logo -->
@@ -52,7 +55,7 @@
       <a routerLink="/" class="brand-logo">LEEDSTORE</a>
     </div>
 
-    <!-- Right Actions: Search & Cart -->
+    <!-- Right Actions: Search & Cart & Logout -->
     <div class="nav-actions">
       <a routerLink="/" [queryParams]="{ focusSearch: 'true' }" class="action-btn" title="Search catalog">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -73,6 +76,18 @@
         }
         <span class="sr-only">Cart</span>
       </a>
+
+      <!-- Logout button — only visible when owner is logged in -->
+      @if (authService.isLoggedIn) {
+        <button class="action-btn logout-btn" (click)="logout()" title="Log out of owner dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span class="sr-only">Log out</span>
+        </button>
+      }
     </div>
   </div>
 </header>
@@ -84,13 +99,14 @@
       <div class="sub-left owner-mode">
         <span class="workspace-tag">OWNER WORKSPACE</span>
         <span class="divider">/</span>
-        <span class="meta-tag">Demo store data</span>
+        <span class="meta-tag">Logged in as store owner</span>
       </div>
 
       <div class="sub-right">
         <a routerLink="/" class="storefront-link">
-          View storefront <span class="arrow">↗</span>
+          View storefront <span class="arrow">→</span>
         </a>
+        <button class="logout-text-btn" (click)="logout()">Log out</button>
       </div>
     } @else {
       <div class="sub-right">
